@@ -1,0 +1,13 @@
+logs
+target
+/.bsp
+/.idea
+/.idea_modules
+/.classpath
+/.project
+/.settings
+/.g8/
+/RUNNING_PID
+/build/
+/conf/production.conf
+/conf/application.conf

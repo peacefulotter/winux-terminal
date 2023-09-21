@@ -1,0 +1,12 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# https://www.playframework.com/documentation/latest/ScalaRouting
+# ~~~~
+
+# An example controller showing a sample home page
+GET     /terminal/get              controllers.TerminalController.get
+POST    /terminal/cmd              controllers.TerminalController.cmd
+GET     /terminal/sse              controllers.TerminalController.sse
+
+# Map static resources from the /public folder to the /assets URL path
+GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)

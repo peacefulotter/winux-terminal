@@ -5,7 +5,7 @@ import os.{Path, StatInfo}
 import scala.util.{Failure, Success, Try}
 import scala.annotation.tailrec
 
-class Find(path: Path) extends Command {
+class Find(path: Path) extends Command[String] {
 	private case class Solver(file: Option[String], depth: Option[Int])
 	
 	@tailrec
@@ -41,8 +41,7 @@ class Find(path: Path) extends Command {
 			solveParams(params) match {
 				case Solver(Some(file), Some(depth)) => findFile(file, depth)
 				case Solver(Some(file), None) => findFile(file, 1)
-				case Solver(None, _)  =>
-					throw new NullPointerException("need to specify a file or directory to search for")
+				case Solver(None, _)  => Response.Failure("Need to specify a file or directory to search for")
 			}
 		}
 		catch {

@@ -2,7 +2,7 @@ package terminal
 
 import os.Path
 import terminal.cmds._
-import terminal.features.History
+import terminal.features.{Autocomplete, History}
 import terminal.helpers.InputHelper.parseInput
 
 class Terminal() {
@@ -10,7 +10,9 @@ class Terminal() {
 	def getPath: Path = path
 	def setPath(path: Path): Unit = this.path = path
 	
+	// features
 	val history = new History
+	val autocomplete = new Autocomplete
 	
 	private def getCommand(text: String): (Option[Command[?]], List[String]) = {
 		val input = parseInput(text)
@@ -35,17 +37,11 @@ class Terminal() {
 			case (Some(cmd), params) =>
 				val res = cmd.handle(params)
 				history.push(text)
+				println(s"RES from command $res")
 				res
 			case _ => Response.Nothing()
 		}
 	}
-	
-	private def handleHistoryPull(routine: () => Option[String]): Response[String] = routine() match {
-		case Some(cmd) => Response.Success(cmd)(ResType.Input)
-		case None => Response.Nothing();
-	}
-	private def handleArrowUp(): Unit = handleHistoryPull(history.older)
-	private def handleArrowDown(): Unit = handleHistoryPull(history.younger)
 	
 	private def handleKill(): Unit = println("===== killing")
 }

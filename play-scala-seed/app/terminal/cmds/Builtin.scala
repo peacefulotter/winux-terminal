@@ -1,7 +1,6 @@
 package terminal.cmds
 
 import os.{Path, SubProcess}
-import terminal.WinuxPanel
 
 import java.io.ByteArrayOutputStream
 import scala.language.postfixOps
@@ -55,6 +54,6 @@ class Builtin(cmd: String, path: Path) extends Command[String] {
 		catch {
 			case e: os.SubprocessException => println(e.getMessage)
 		}
-		Response.Nothing()
+		Response.Nothing[String]()
 	}
 }

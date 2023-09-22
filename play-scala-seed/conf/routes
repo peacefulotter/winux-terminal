@@ -6,6 +6,9 @@
 # An example controller showing a sample home page
 GET     /terminal/get              controllers.TerminalController.get
 POST    /terminal/cmd              controllers.TerminalController.cmd
+POST    /terminal/autocomplete     controllers.TerminalController.autocomplete
+POST    /terminal/history/up       controllers.TerminalController.up
+POST    /terminal/history/down     controllers.TerminalController.down
 GET     /terminal/sse              controllers.TerminalController.sse
 
 # Map static resources from the /public folder to the /assets URL path

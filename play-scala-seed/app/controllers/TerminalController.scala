@@ -5,13 +5,16 @@ import akka.stream.OverflowStrategy
 import akka.stream.scaladsl.Source
 import managers.ActorRefManager
 import managers.ActorRefManager.{Register, SendMessage, UnRegister}
-import models.Message
 import play.api.http.ContentTypes
 import play.api.libs.EventSource
+import play.api.libs.json._
 import play.api.mvc._
-import play.filters.csrf.CSRFAddToken
 import play.libs.Json
 import terminal.Terminal
+import terminal.cmds.Response
+import WritableImplicits._
+import com.fasterxml.jackson.databind.JsonNode
+import os.Path
 
 import javax.inject._
 import scala.concurrent.ExecutionContext
@@ -40,16 +43,50 @@ class TerminalController @Inject()(
 		Ok("GET Got request [" + request + "]")
 	}
 	
-	def cmd: Action[AnyContent] = Action { implicit request =>
+	private def resToJson(res: Response[_]): JsObject = res match {
+		case Response.Success(data) => JsObject(Seq(
+			"status" -> JsNumber(res.status.id),
+			"name" -> JsString(data.name),
+			"data" -> data.json
+		))
+		case Response.Failure(msg) => JsObject(Seq(
+			"status" -> JsNumber(res.status.id),
+			"data" -> JsString(msg)
+		))
+		case res: Response.Nothing[_] => JsObject(Seq(
+			"status" -> JsNumber(res.status.id),
+		))
+	}
+	
+	private def getBody(f: (String, Path) => Response[_])(implicit request: Request[AnyContent]): Result =
 		request.body.asJson match {
-			case Some(json) => {
-				val cmd = json("cmd").as[String]
-				val res = terminal.handleCommand(cmd)
-				Ok(Json.toJson(res))
-			}
-			case None => ;
+			case Some(body) =>
+				val (cmd, path) = (body("cmd").as[String], body("path").as[String])
+				println(s"$cmd, $path")
+				val res = f(cmd, Path(path))
+				val json = resToJson(res)
+				println(s"final json $json")
+				Ok(json)
+			case None =>
+				Ok("No json body passed")
 		}
-		Ok("POST request")
+	
+	def cmd: Action[AnyContent] = Action { implicit request =>
+		getBody { (cmd, _) => terminal.handleCommand(cmd) }
+	}
+	
+	def autocomplete: Action[AnyContent] = Action { implicit request =>
+		getBody { (cmd, path) =>
+			terminal.autocomplete.handle(cmd, path)
+		}
+	}
+	
+	def up: Action[AnyContent] = Action { implicit request =>
+		getBody { (_, _) => terminal.history.arrowUp() }
+	}
+	
+	def down: Action[AnyContent] = Action { implicit request =>
+		getBody { (_, _) => terminal.history.arrowDown() }
 	}
 	
 	def sse: Action[AnyContent] = Action {

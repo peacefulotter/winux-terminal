@@ -23,7 +23,7 @@ class Ls(path: Path) extends Command[List[(String, Boolean)]] {
 				.sortBy { case (p, attrs) => attrs.isFile }
 				.map { case (p, attrs) => (p.baseName, attrs.isDir) }
 				.toList
-			Response.Success(content)(ResType.Flex)
+			Response.Success(DataFlex(content))
 		case Right(msg) => Response.Failure(msg)
 	}
 }

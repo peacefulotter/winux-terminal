@@ -8,12 +8,12 @@ import scala.util.{Failure, Success}
 class Cd(terminal: Terminal) extends Command[String] {
 	def handle(params: List[String]): Response[String] = {
 		if ( params.isEmpty )
-			return Response.Nothing()
+			return Response.Nothing[String]()
 		
 		PathHelper.getSubPath(terminal.getPath, params.head) match {
 			case Success(path) =>
 				if (os.isDir(path))
-					Response.Success(path.toString())(ResType.Path)
+					Response.Success(DataPath(path.toString()))
 				else
 					Response.Failure(f"$path is not a directory")
 			case Failure(exception) =>

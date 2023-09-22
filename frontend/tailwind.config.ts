@@ -10,6 +10,7 @@ const config: Config = {
     extend: {
       colors: {
         background: '#1E2838',
+        'background-dark': '#0E1828',
         foreground: '#FFFFFF',
         dollar: '#787878',
         path: '#32C864',

@@ -1,7 +1,7 @@
 package terminal.features
 
 import os.{Path, StatInfo}
-import terminal.cmds.{ResType, Response}
+import terminal.cmds.{DataInput, Response}
 import terminal.helpers.{InputHelper, PathHelper}
 
 import scala.util.{Failure, Success}
@@ -10,8 +10,6 @@ class Autocomplete {
 	// returns ( <partial+optional>childFolder, matched folders and files)
 	private type Child = Option[String]
 	private type Candidates = IndexedSeq[(Path, StatInfo)]
-	
-	implicit val resType: ResType.Value = ResType.Input
 	
 	private def getCompletionCandidates(cmd: String, path: Path): Either[(Child, Candidates), String] = {
 		if (cmd.isEmpty || cmd.last == ' ') {
@@ -56,7 +54,7 @@ class Autocomplete {
 		
 		if (candidates.length == 1) {
 			val autocompleted = getTextDropChildFolder + PathHelper.getFileName(candidates.head)
-			Response.Success(autocompleted)
+			Response.Success(DataInput(autocompleted))
 		}
 		
 		else if (candidates.length > 1) {
@@ -65,17 +63,18 @@ class Autocomplete {
 			val autocompleted = getTextDropChildFolder + commonPath
 			// TODO:
 			// winux.add(Components.filesList(candidates))
-			Response.Success(autocompleted)
+			Response.Success(DataInput(autocompleted))
 		}
 		
-		Response.Nothing()
+		else
+			Response.Nothing()
 	}
 	
-	def handle(cmd: String, path: Path): Unit = {
+	def handle(cmd: String, path: Path): Response[String] = {
 		getCompletionCandidates(cmd, path) match {
 			case Left((child, candidates)) => autocomplete(cmd, path, child, candidates)
 			case Right(msg) => Response.Failure(msg)
-			case _ => ;
+			case _ => Response.Nothing();
 		}
 	}
 }

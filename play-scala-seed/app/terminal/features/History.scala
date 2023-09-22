@@ -1,5 +1,7 @@
 package terminal.features
 
+import terminal.cmds.{DataInput, Response}
+
 import scala.collection.mutable.ListBuffer
 
 class History() {
@@ -18,18 +20,24 @@ class History() {
 		history.prepend(cmd)
 	}
 	
-	def older(): Option[String] = {
+	private def older(): Option[String] = {
 		index = math.min(history.size - 1, index + 1)
 		history.lift(index)
 	}
 	
-	
-	def younger(): Option[String] = {
+	private def younger(): Option[String] = {
 		index = math.max(DEFAULT_INDEX, index - 1)
 		history.lift(index)
 	}
 	
-	def get: ListBuffer[String] = history;
+	private def handleHistoryPull(routine: () => Option[String]): Response[String] = routine() match {
+		case Some(cmd) => Response.Success(DataInput(cmd))
+		case None => Response.Nothing();
+	}
+	
+	def get: ListBuffer[String] = history
+	def arrowUp(): Response[String] = handleHistoryPull(older)
+	def arrowDown(): Response[String] = handleHistoryPull(younger)
 }
 
 object History {

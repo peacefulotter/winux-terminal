@@ -9,11 +9,10 @@ lazy val root = (project in file("."))
 
 scalaVersion := "2.13.10"
 
-val playSlickVersion = "5.1.0"
-
 libraryDependencies += guice
-libraryDependencies += "org.scalatestplus.play" %% "scalatestplus-play" % playSlickVersion % Test
+libraryDependencies += "org.scalatestplus.play" %% "scalatestplus-play" % "5.1.0" % Test
 libraryDependencies += "com.lihaoyi" %% "os-lib" % "0.9.1"
+// libraryDependencies += "com.github.tototoshi" %% "play-json-generic" % "0.1.2"
 
 // Adds additional packages into Twirl
 //TwirlKeys.templateImports += "com.example.controllers._"

@@ -72,7 +72,7 @@ class TerminalController @Inject()(
 		}
 	
 	def cmd: Action[AnyContent] = Action { implicit request =>
-		getBody { (cmd, _) => terminal.handleCommand(cmd) }
+		getBody { (cmd, path) => terminal.handleCommand(cmd, path) }
 	}
 	
 	def autocomplete: Action[AnyContent] = Action { implicit request =>

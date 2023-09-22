@@ -12,6 +12,8 @@ interface Props {
 export default function useActions( { cmd, path, setCmd, setPath }: Props ) {
 
     const callback = ({status, name, data}: Response<any>) => {
+		console.log(status, name, data);
+		
         if (status === Status.Nothing) 
 			return
         else if (status === Status.Error)
@@ -28,6 +30,7 @@ export default function useActions( { cmd, path, setCmd, setPath }: Props ) {
 					break;
 				case 'path':
 					setPath(data)
+					setCmd('')
 					break;
 				case 'input':
 					console.log("input", data);

@@ -1,7 +1,9 @@
 package terminal.cmds
 
-class Cat() extends Command[String] {
-	def handle(params: List[String]): Response[String] = {
+import models.Response
+
+class Cat() extends Command {
+	def handle(params: List[String]): Response = {
 		Response.Success(DataLine("cat"))
 	}
 }

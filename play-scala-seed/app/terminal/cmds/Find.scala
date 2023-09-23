@@ -1,11 +1,12 @@
 package terminal.cmds
 
+import models.Response
 import os.{Path, StatInfo}
 
 import scala.util.{Failure, Success, Try}
 import scala.annotation.tailrec
 
-class Find(path: Path) extends Command[String] {
+class Find(path: Path) extends Command {
 	private case class Solver(file: Option[String], depth: Option[Int])
 	
 	@tailrec
@@ -22,7 +23,7 @@ class Find(path: Path) extends Command[String] {
 		}
 	}
 	
-	private def findFile(file: String, depth: Int): Response[String] = {
+	private def findFile(file: String, depth: Int): Response = {
 		// TODO: res whenever we want outside return
 		// winux.add( s"Searching for '$file' with depth=$depth..." )
 
@@ -36,7 +37,7 @@ class Find(path: Path) extends Command[String] {
 		Response.Nothing()
 	}
 	
-	def handle(params: List[String]): Response[String] = {
+	def handle(params: List[String]): Response = {
 		try {
 			solveParams(params) match {
 				case Solver(Some(file), Some(depth)) => findFile(file, depth)

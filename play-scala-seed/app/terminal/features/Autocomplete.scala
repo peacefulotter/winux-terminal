@@ -1,7 +1,8 @@
 package terminal.features
 
+import models.Response
 import os.{Path, StatInfo}
-import terminal.cmds.{DataInput, Response}
+import terminal.cmds.DataInput
 import terminal.helpers.{InputHelper, PathHelper}
 
 import scala.util.{Failure, Success}
@@ -45,7 +46,7 @@ class Autocomplete {
 		}
 	}
 	
-	private def autocomplete(cmd: String, path: Path, child: Child, candidates: Candidates): Response[String] = {
+	private def autocomplete(cmd: String, path: Path, child: Child, candidates: Candidates): Response = {
 		def getTextDropChildFolder: String =
 			child match {
 				case Some(partialFolder) => cmd.dropRight(partialFolder.length)
@@ -70,7 +71,7 @@ class Autocomplete {
 			Response.Nothing()
 	}
 	
-	def handle(cmd: String, path: Path): Response[String] = {
+	def handle(cmd: String, path: Path): Response = {
 		getCompletionCandidates(cmd, path) match {
 			case Left((child, candidates)) => autocomplete(cmd, path, child, candidates)
 			case Right(msg) => Response.Failure(msg)

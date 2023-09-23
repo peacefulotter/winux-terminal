@@ -1,7 +1,8 @@
 package managers;
 
-import ActorRefManager.{Register, SendMessage, UnRegister}
+import ActorRefManager.{Register, SendResponse, UnRegister}
 import akka.actor.{Actor, ActorRef, Props}
+import models.Response
 
 class ActorRefManager extends Actor {
     private[this] val actor: Option[ActorRef] = None
@@ -10,9 +11,11 @@ class ActorRefManager extends Actor {
   
     private def onMessage(actor: Option[ActorRef]): Receive = {
         case Register(actorRef) => context.become(onMessage(Some(actorRef)))
-        case UnRegister(actorRef) => context.become(onMessage(None))
-        case SendMessage(message) => actor match {
-            case Some(ref) => ref ! message
+        case UnRegister(_) => context.become(onMessage(None))
+        case SendResponse(res) => actor match {
+            case Some(ref) =>
+                println(res.toJson.toString())
+                ref ! res.toJson.toString()
             case None => ;
         }
     }
@@ -21,7 +24,7 @@ class ActorRefManager extends Actor {
 object ActorRefManager {
   def props: Props = Props[ActorRefManager]
 
-  case class SendMessage(message: String)
+  case class SendResponse(res: Response)
   case class Register(actorRef: ActorRef)
   case class UnRegister(actorRef: ActorRef)
 }

@@ -1,59 +1,56 @@
 package terminal.cmds
 
+import akka.actor.ActorRef
+import managers.ActorRefManager.SendResponse
+import models.Response
 import os.{Path, SubProcess}
 
 import java.io.ByteArrayOutputStream
 import scala.language.postfixOps
 
-class Builtin(cmd: String, path: Path) extends Command[String] {
+class Builtin(manager: ActorRef, cmd: String, path: Path) extends Command {
 	
-//	private def process(f: String => Unit) = os.ProcessOutput.Readlines(f)
-//	private def processOut = process(line =>
-//		println(s"'$line '")
-//		winux.addMessage(line))
-//	private def processErr = process(winux.addErrorMessage)
+//	private def process(f: (Array[Byte], Int) => Unit) = os.ProcessOutput.ReadBytes(f)
+//
+//	private def processOut = process( (line, len) => {
+//		val buf = line.slice(0, len)
+//		val other = buf.map(b =>
+//			(b.toInt, b.toChar)
+//		)
+//		println(s"OUT '${buf.mkString("Array(", ", ", ")")} '")
+//		println(s"other '${other.mkString("Array(", ", ", ")")} '")
+//
+//	} )
+//
+//	private def processErr = process( (line, len) => {
+//		val buf = line.slice(0, len)
+//		println(s"ERR '${buf.map(_.toChar).mkString("Array(", ", ", ")")} '")
+//	} )
 	
-	private def process(f: (Array[Byte], Int) => Unit) = os.ProcessOutput.ReadBytes(f)
+	private def process(f: String => Unit) = os.ProcessOutput.Readlines(f)
 	
-	private def processOut = process( (line, len) => {
-		val buf = line.slice(0, len)
-		val other = buf.map(b =>
-			(b.toInt, b.toChar)
-		)
-		println(s"OUT '${buf.mkString("Array(", ", ", ")")} '")
-		println(s"other '${other.mkString("Array(", ", ", ")")} '")
-	} )
+	private def processOut = process( line => {
+		println(f"OUT $line")
+		manager ! SendResponse(Response.Success(DataLine(line)))
+	})
 	
-	private def processErr = process( (line, len) => {
-		val buf = line.slice(0, len)
-		println(s"ERR '${buf.map(_.toChar).mkString("Array(", ", ", ")")} '")
-	} )
+	private def processErr = process( line => {
+		println(f"ERR $line")
+		manager ! SendResponse(Response.Failure(line))
+	})
 	
-	def handle(params: List[String]): Response[String] = {
+	def handle(params: List[String]): Response = {
 		try {
-			println(path)
-			println(cmd :: params)
-			
-//			os.proc(cmd :: params).call(
-//				cwd = wd,
-//				env = Map("TERM" -> "xterm-color"),
-//				stdout = processOut,
-//				stderr = processErr
-//			)
-			val proc = os.proc(cmd :: params).spawn(
+			os.proc(cmd :: params).spawn(
 				cwd = path,
-				env = Map("TERM" -> "xterm"),
+				env = Map("TERM" -> "xterm-color"),
+				stdout = processOut,
 				stderr = processErr
 			)
-			println("here")
-			for (i <- 0 until 10000) {
-				val s = proc.stdout.data.readByte()
-				println((s.toInt, s.toChar))
-			}
 		}
 		catch {
 			case e: os.SubprocessException => println(e.getMessage)
 		}
-		Response.Nothing[String]()
+		Response.Nothing()
 	}
 }

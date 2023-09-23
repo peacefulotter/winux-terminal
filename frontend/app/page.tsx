@@ -8,17 +8,16 @@ import useSSE from "@/hooks/useSSE"
 
 export default function Home() {
   return (
-    <main className="flex h-screen flex-col items-center justify-between px-32 py-16 font-mono">
+    <main className="flex h-screen flex-col items-center justify-center px-32 gap-2 font-mono overflow-hidden">
       <Welcome />
-      <div className='w-full h-full rounded-3xl p-2 bg-gradient-to-br from-fuchsia-800 to-sky-800 mt-3'>
-        <div className='w-full h-full flex flex-col rounded-2xl border border-neutral-800 bg-background overflow-hidden'>
+      <div className='w-full rounded-3xl p-2 bg-gradient-to-br from-fuchsia-800 to-sky-800 mt-3'>
+        <div className='w-full h-[70vh] flex flex-col rounded-2xl border border-neutral-800 bg-background overflow-hidden'>
           <TerminalProvider>
             <ConnectionStatus />
             <Terminal />
           </TerminalProvider>
         </div>
       </div>
-      
     </main>
   )
 }

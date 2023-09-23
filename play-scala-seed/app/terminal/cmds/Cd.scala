@@ -1,12 +1,13 @@
 package terminal.cmds
 
+import models.Response
 import os.Path
 import terminal.helpers.PathHelper
 
 import scala.util.{Failure, Success}
 
-class Cd(path: Path) extends Command[String] {
-	def handle(params: List[String]): Response[String] = {
+class Cd(path: Path) extends Command {
+	def handle(params: List[String]): Response = {
 		if ( params.isEmpty )
 			return Response.Nothing[String]()
 		

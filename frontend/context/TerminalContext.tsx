@@ -1,7 +1,7 @@
 import useCmdCallback from "@/hooks/useCmdCallback";
 import useLines from "@/hooks/useLines";
 import useSSE from "@/hooks/useSSE";
-import { Actions, Status } from "@/types";
+import { Actions, Response, Status } from "@/types";
 import terminalFetch from "@/utils/fetch";
 import {
 	createContext,
@@ -28,15 +28,21 @@ export const TerminalProvider = ({ children }: PropsWithChildren) => {
     const [cmd, setCmd] = useState<string>('')
 
     const { sse, status } = useSSE()
-    const { lines, addCmdLine, addFixedCmdLine } = useLines({ setCmd })
-    const callback = useCmdCallback({ setCmd, setPath, addFixedCmdLine, addCmdLine })
+    const { lines, addLine, addList, addFlex, addCmdLine, addFixedCmdLine } = useLines({ setCmd })
+    const callback = useCmdCallback({ setCmd, setPath, addLine, addList, addFlex, addFixedCmdLine, addCmdLine })
 
     const fetch = (endpoint: string) => () => {
 		terminalFetch(endpoint, { cmd, path }, callback(cmd, path))
 	}
+    // Prevent sending request if cmd is empty
+    const emptyMiddleware = ( f: () => void ) => {
+        return () => cmd.trim().length === 0 
+            ? (function() { addFixedCmdLine(cmd, path); addCmdLine(); })()   
+            : f()
+    }
     const actions: Actions = {
 		'Tab': fetch('/autocomplete'),
-		'Enter': fetch('/cmd'),
+		'Enter': emptyMiddleware( fetch('/cmd') ),
 		'ArrowUp': fetch('/history/up'),
 		'ArrowDown': fetch('/history/down'),
     }
@@ -49,7 +55,7 @@ export const TerminalProvider = ({ children }: PropsWithChildren) => {
         if (sse === undefined) return;
         sse.onmessage = ({data}) => {
             const json = JSON.parse(data)
-            console.log(json);
+            callback(cmd, path)(json as Response<any>, true)
         }
     }, [sse])
     

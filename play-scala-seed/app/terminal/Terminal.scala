@@ -1,34 +1,36 @@
 package terminal
 
+import akka.actor.ActorRef
+import models.Response
 import os.Path
 import terminal.cmds._
 import terminal.features.{Autocomplete, History}
 import terminal.helpers.InputHelper.parseInput
 
-class Terminal() {
+class Terminal(manager: ActorRef) {
 	// features
 	val history = new History
 	val autocomplete = new Autocomplete
 	
-	private def getCommand(text: String, path: Path): (Option[Command[?]], List[String]) = {
+	private def getCommand(text: String, path: Path): (Option[Command], List[String]) = {
 		val input = parseInput(text)
 		if (input.isEmpty) {
-			return (Option.empty[Command[?]], Nil)
+			return (Option.empty[Command], Nil)
 		}
 		
 		val (keyword, params) = (input.head, input.tail)
-		val cmd: Command[?] = keyword match {
+		val cmd: Command = keyword match {
 			case "cat" => new Cat()
 			case "cd" => new Cd(path)
 			case "ls" => new Ls(path)
 			case "find" => new Find(path)
 			case "history" => new HistoryCmd(history)
-			case _ => new Builtin(keyword, path) // new Err(keyword)
+			case _ => new Builtin(manager, keyword, path) // new Err(keyword)
 		}
 		(Some(cmd), params)
 	}
 	
-	def handleCommand(text: String, path: Path): Response[?] = {
+	def handleCommand(text: String, path: Path): Response = {
 		getCommand(text, path) match {
 			case (Some(cmd), params) =>
 				val res = cmd.handle(params)

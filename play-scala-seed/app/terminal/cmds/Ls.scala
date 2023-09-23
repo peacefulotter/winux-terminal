@@ -1,11 +1,12 @@
 package terminal.cmds
 
+import models.Response
 import os.{Path, StatInfo}
 import terminal.helpers.PathHelper
 
 import scala.util.{Failure, Success}
 
-class Ls(path: Path) extends Command[List[(String, Boolean)]] {
+class Ls(path: Path) extends Command {
 	
 	private def getDirectory(params: List[String]): Either[Path, String] = {
 		if (params.nonEmpty)
@@ -17,7 +18,7 @@ class Ls(path: Path) extends Command[List[(String, Boolean)]] {
 			Left(path)
 	}
 	
-	def handle(params: List[String]): Response[List[(String, Boolean)]] = getDirectory(params) match {
+	def handle(params: List[String]): Response = getDirectory(params) match {
 		case Left(dir) =>
 			val content = os.walk.attrs(dir, maxDepth = 1)
 				.sortBy { case (p, attrs) => attrs.isFile }

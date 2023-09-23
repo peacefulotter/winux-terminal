@@ -1,6 +1,7 @@
 package terminal.features
 
-import terminal.cmds.{DataInput, Response}
+import models.Response
+import terminal.cmds.DataInput
 
 import scala.collection.mutable.ListBuffer
 
@@ -30,14 +31,14 @@ class History() {
 		history.lift(index)
 	}
 	
-	private def handleHistoryPull(routine: () => Option[String]): Response[String] = routine() match {
+	private def handleHistoryPull(routine: () => Option[String]): Response = routine() match {
 		case Some(cmd) => Response.Success(DataInput(cmd))
 		case None => Response.Nothing();
 	}
 	
 	def get: ListBuffer[String] = history
-	def arrowUp(): Response[String] = handleHistoryPull(older)
-	def arrowDown(): Response[String] = handleHistoryPull(younger)
+	def arrowUp(): Response = handleHistoryPull(older)
+	def arrowDown(): Response = handleHistoryPull(younger)
 }
 
 object History {

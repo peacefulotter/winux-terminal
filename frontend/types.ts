@@ -8,3 +8,12 @@ export type Response<T> = {
 }
 
 export type Actions = Record<string, () => void>
+
+
+export const Color = {
+  'success': 'text-success',
+  'error': 'text-error',
+  'info': 'text-info',
+  'file': 'text-file',
+  'directory': 'text-directory'
+} as const

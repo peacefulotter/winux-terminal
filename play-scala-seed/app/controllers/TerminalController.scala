@@ -4,16 +4,16 @@ import akka.actor.ActorSystem
 import akka.stream.OverflowStrategy
 import akka.stream.scaladsl.Source
 import managers.ActorRefManager
-import managers.ActorRefManager.{Register, SendMessage, UnRegister}
+import managers.ActorRefManager.{Register, UnRegister}
 import play.api.http.ContentTypes
 import play.api.libs.EventSource
 import play.api.libs.json._
 import play.api.mvc._
 import play.libs.Json
 import terminal.Terminal
-import terminal.cmds.Response
 import WritableImplicits._
 import com.fasterxml.jackson.databind.JsonNode
+import models.Response
 import os.Path
 
 import javax.inject._
@@ -30,41 +30,20 @@ class TerminalController @Inject()(
 )(implicit ec: ExecutionContext) extends AbstractController(cc) {
 	
 	private[this] val manager = system.actorOf(ActorRefManager.props)
-	private[this] val terminal = new Terminal()
+	private[this] val terminal = new Terminal(manager)
 	
-	private def sendMessage: Runnable = new Runnable() {
-		def run(): Unit = {
-			val msg = "here I am a young man"// Message(...).toString
-			manager ! SendMessage(msg)
-		}
-	}
+	// manager ! SendResponse(response)
 	
 	def get: Action[AnyContent] = Action { implicit request =>
 		Ok("GET Got request [" + request + "]")
 	}
 	
-	private def resToJson(res: Response[_]): JsObject = res match {
-		case Response.Success(data) => JsObject(Seq(
-			"status" -> JsNumber(res.status.id),
-			"name" -> JsString(data.name),
-			"data" -> data.json
-		))
-		case Response.Failure(msg) => JsObject(Seq(
-			"status" -> JsNumber(res.status.id),
-			"data" -> JsString(msg)
-		))
-		case res: Response.Nothing[_] => JsObject(Seq(
-			"status" -> JsNumber(res.status.id),
-		))
-	}
-	
-	private def getBody(f: (String, Path) => Response[_])(implicit request: Request[AnyContent]): Result =
+	private def getBody(f: (String, Path) => Response)(implicit request: Request[AnyContent]): Result =
 		request.body.asJson match {
 			case Some(body) =>
 				val (cmd, path) = (body("cmd").as[String], body("path").as[String])
 				println(s"$cmd, $path")
-				val res = f(cmd, Path(path))
-				val json = resToJson(res)
+				val json = f(cmd, Path(path)).toJson
 				println(s"final json $json")
 				Ok(json)
 			case None =>

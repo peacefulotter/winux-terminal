@@ -2,6 +2,9 @@ import React, { Dispatch, ReactNode, SetStateAction, useState } from "react";
 
 import FixedCommandLine from "@/components/FixedCommandLine";
 import CommandLine from "@/components/CommandLine";
+import Line from "@/components/Line";
+import ListLine from "@/components/ListLine";
+import FlexLine from "@/components/FlexLine";
 
 interface Props {
 	setCmd: Dispatch<SetStateAction<string>>
@@ -17,6 +20,18 @@ export default function useLines( { setCmd }: Props ) {
         setLines(prev => [...prev, getNodeWrapper(node, prev.length)])
     }
 
+    const addLine = (text: string, color?: string) => add(
+        <Line text={text} color={color} />
+    )
+
+    const addList = (data: string[]) => add(
+        <ListLine data={data} />
+    )
+
+    const addFlex = (data: [string, boolean][]) => add(
+        <FlexLine data={data} />
+    )
+
     const addCmdLine = () => add(
         <CommandLine setCmd={setCmd} />
     )
@@ -28,5 +43,5 @@ export default function useLines( { setCmd }: Props ) {
         return temp
     } )
 
-	return { lines, addCmdLine, addFixedCmdLine }
+	return { lines, addLine, addList, addFlex, addCmdLine, addFixedCmdLine }
 }

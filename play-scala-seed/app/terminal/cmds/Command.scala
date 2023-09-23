@@ -1,5 +1,7 @@
 package terminal.cmds
 
-abstract class Command[T] {
-	def handle(params: List[String]): Response[T];
+import models.Response
+
+abstract class Command {
+	def handle(params: List[String]): Response
 }

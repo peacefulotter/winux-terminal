@@ -1,21 +1,29 @@
 
-import { Actions } from "@/types";
-import { ChangeEventHandler, Dispatch, KeyboardEventHandler, SetStateAction } from "react"
+import { ChangeEventHandler, Dispatch, KeyboardEventHandler, SetStateAction, useEffect, useRef } from "react"
+import { useTerminal } from "@/context/TerminalContext";
+import BaseCommandLine from "./BaseCommandLine";
 
 interface ICommandLine {
-    cmd: string;
-    path: string;
     setCmd: Dispatch<SetStateAction<string>>
-    actions: Actions
 }
 
-export default function CommandLine( { cmd, path, setCmd, actions }: ICommandLine ) {
+export default function CommandLine( { setCmd }: ICommandLine ) {
+
+    const { cmd, path, actions } = useTerminal()
+
+    const ref = useRef<HTMLInputElement>(null);
+
+    useEffect(() => {
+        if (ref.current) {
+            ref.current.focus();
+        }
+    }, []);
 
     const onChange: ChangeEventHandler<HTMLInputElement> = (e) => {
       	setCmd(e.target.value)
     }
   
-    const keyDownHandler: KeyboardEventHandler<HTMLInputElement> = (e) => {
+    const onKeyDown: KeyboardEventHandler<HTMLInputElement> = (e) => {
         if (Object.keys(actions).includes(e.key)) {
             e.preventDefault()
             e.stopPropagation()
@@ -24,16 +32,15 @@ export default function CommandLine( { cmd, path, setCmd, actions }: ICommandLin
     }
   
     return (
-      	<div className='flex gap-2'>
-			<p className='text-path whitespace-nowrap'>{path}</p>
-			<p className='text-dollar'>$</p>
-			<input 
-				className='bg-transparent text-foreground outline-none w-full' 
-				type='text' 
-				value={cmd} 
-				onChange={onChange} 
-				onKeyDown={keyDownHandler}/>
-      	</div>
+      	<BaseCommandLine path={path}> 
+            <input 
+                ref={ref}
+                className='bg-transparent text-foreground outline-none w-full' 
+                type='text' 
+                value={cmd} 
+                onChange={onChange}
+                onKeyDown={onKeyDown} />
+        </BaseCommandLine>
     )
 }
   

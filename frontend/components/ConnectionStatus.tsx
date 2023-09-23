@@ -1,9 +1,5 @@
+import { useTerminal } from "@/context/TerminalContext"
 import { Status } from "@/types"
-
-
-interface IConnectionStatus {
-    status: Status
-}
 
 const states = {
     [Status.Error]: ["#e44", 'Disconnected'],
@@ -11,7 +7,8 @@ const states = {
     [Status.Success]: ["#5e5", 'Connected'] 
 } as const
 
-export default function ConnectionStatus( { status }: IConnectionStatus ) {
+export default function ConnectionStatus() {
+    const { status } = useTerminal()
     const [color, text] = states[status]
     return (
         <div className='flex items-center gap-3 px-8 py-2 bg-background-dark'>

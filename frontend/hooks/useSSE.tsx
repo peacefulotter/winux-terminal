@@ -16,12 +16,7 @@ export default function useSSE() {
 			setStatus(Status.Error)
 			console.log('error in opening conn.');
 		}
-		es.onmessage = (event) => {
-		  console.log('got message..',event)
-		  console.log( JSON.parse(event.data) )
-		}
 		setSSE(es)
-
 		return () => setStatus(Status.Nothing)
 	}, [])
 

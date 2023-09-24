@@ -3,13 +3,10 @@ import { ChangeEventHandler, Dispatch, KeyboardEventHandler, SetStateAction, use
 import { useTerminal } from "@/context/TerminalContext";
 import BaseCommandLine from "./BaseCommandLine";
 
-interface ICommandLine {
-    setCmd: Dispatch<SetStateAction<string>>
-}
 
-export default function CommandLine( { setCmd }: ICommandLine ) {
+export default function CommandLine() {
 
-    const { cmd, path, actions } = useTerminal()
+    const { cmd, path, actions, setCmd } = useTerminal()
 
     const ref = useRef<HTMLInputElement>(null);
 

@@ -1,7 +1,7 @@
 package terminal.features
 
 import models.Response
-import terminal.cmds.DataInput
+import terminal.cmds.DataHistory
 
 import scala.collection.mutable.ListBuffer
 
@@ -32,7 +32,7 @@ class History() {
 	}
 	
 	private def handleHistoryPull(routine: () => Option[String]): Response = routine() match {
-		case Some(cmd) => Response.Success(DataInput(cmd))
+		case Some(cmd) => Response.Success(DataHistory(cmd))
 		case None => Response.Nothing();
 	}
 	

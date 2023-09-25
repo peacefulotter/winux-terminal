@@ -1,5 +1,5 @@
 
-import { PropsWithChildren } from "react"
+import { useEffect, useState } from "react"
 import BaseCommandLine from "./BaseCommandLine";
 
 interface IFixedCommandLine {

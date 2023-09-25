@@ -1,11 +1,13 @@
 
-import { ChangeEventHandler, Dispatch, KeyboardEventHandler, SetStateAction, useEffect, useRef } from "react"
+import { ChangeEventHandler, Dispatch, KeyboardEventHandler, SetStateAction, useEffect, useRef, useState } from "react"
 import { useTerminal } from "@/context/TerminalContext";
 import BaseCommandLine from "./BaseCommandLine";
+import FixedCommandLine from "./FixedCommandLine";
 
 
 export default function CommandLine() {
 
+    const [fixedData, setFixedData] = useState({cmd: '', path: '', isFixed: false})
     const { cmd, path, actions, setCmd } = useTerminal()
 
     const ref = useRef<HTMLInputElement>(null);
@@ -24,12 +26,15 @@ export default function CommandLine() {
         if (Object.keys(actions).includes(e.key)) {
             e.preventDefault()
             e.stopPropagation()
-            actions[e.key]()
+            actions[e.key]().then(isFixed => {
+                setFixedData({isFixed, cmd, path})
+            })
         }
     }
-  
-    return (
-      	<BaseCommandLine path={path}> 
+    
+    return fixedData.isFixed
+        ? <FixedCommandLine cmd={fixedData.cmd} path={fixedData.path} />
+        : <BaseCommandLine path={path}> 
             <input 
                 ref={ref}
                 className='bg-transparent text-foreground outline-none w-full' 
@@ -38,6 +43,5 @@ export default function CommandLine() {
                 onChange={onChange}
                 onKeyDown={onKeyDown} />
         </BaseCommandLine>
-    )
 }
   

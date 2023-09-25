@@ -1,13 +1,14 @@
 package terminal.features
 
+import akka.actor.ActorRef
 import models.Response
 import os.{Path, StatInfo}
-import terminal.cmds.DataInput
+import terminal.cmds.DataAutocompletion
 import terminal.helpers.{InputHelper, PathHelper}
 
 import scala.util.{Failure, Success}
 
-class Autocomplete {
+class Autocomplete(manager: ActorRef) {
 	// returns ( <partial+optional>childFolder, matched folders and files)
 	private type Child = Option[String]
 	private type Candidates = IndexedSeq[(Path, StatInfo)]
@@ -53,18 +54,19 @@ class Autocomplete {
 				case None => cmd
 			}
 		
+		def getCommonPrefix(a: String, b: String): String =
+			a.zip(b).takeWhile(Function.tupled(_ == _)).map(_._1).mkString
+			
 		if (candidates.length == 1) {
-			val autocompleted = getTextDropChildFolder + PathHelper.getFileName(candidates.head)
-			Response.Success(DataInput(autocompleted))
+			val autocompletion = getTextDropChildFolder + PathHelper.getFileName(candidates.head)
+			Response.Success(DataAutocompletion(autocompletion))
 		}
 		
 		else if (candidates.length > 1) {
-			val candidatePaths = candidates.map(_._1.baseName)
-			val commonPath = candidatePaths.fold(candidatePaths.head)((acc, cur) => acc.intersect(cur))
-			val autocompleted = getTextDropChildFolder + commonPath
-			// TODO:
-			// winux.add(Components.filesList(candidates))
-			Response.Success(DataInput(autocompleted))
+			val propositions = candidates.map { c => (c._1.baseName, c._2.isDir) }
+			val commonPath = propositions.foldLeft(propositions.head._1)((acc, cur) => getCommonPrefix(acc, cur._1))
+			val autocompletion = getTextDropChildFolder + commonPath
+			Response.Success(DataAutocompletion(autocompletion, propositions))
 		}
 		
 		else

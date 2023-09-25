@@ -10,7 +10,7 @@ import terminal.helpers.InputHelper.parseInput
 class Terminal(manager: ActorRef) {
 	// features
 	val history = new History
-	val autocomplete = new Autocomplete
+	val autocomplete = new Autocomplete(manager)
 	
 	private def getCommand(text: String, path: Path): (Option[Command], List[String]) = {
 		val input = parseInput(text)

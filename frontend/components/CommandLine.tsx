@@ -1,9 +1,6 @@
 
 import { ChangeEventHandler, KeyboardEventHandler, useEffect, useMemo, useRef, useState } from "react"
 import { useTerminal } from "@/context/TerminalContext";
-import BaseCommandLine from "./BaseCommandLine";
-import FixedCommandLine from "./FixedCommandLine";
-
 
 export default function CommandLine() {
 
@@ -43,8 +40,10 @@ export default function CommandLine() {
     }
     
     return (
-        <BaseCommandLine path={data.path}> 
-            <input 
+        <div className='flex gap-2'>
+			<p className='text-path whitespace-nowrap'>{data.path}</p>
+			<p className='text-dollar'>$</p>
+			<input 
                 disabled={disabled}
                 ref={ref}
                 className='bg-transparent text-foreground outline-none w-full' 
@@ -52,7 +51,7 @@ export default function CommandLine() {
                 value={data.cmd} 
                 onChange={onChange}
                 onKeyDown={onKeyDown} />
-        </BaseCommandLine>
+      	</div>
     )
 }
   

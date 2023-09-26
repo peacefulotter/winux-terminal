@@ -11,6 +11,7 @@ import FlexLine from "./FlexLine"
 
 export default function Terminal() {
     const lines = useSelector((state: RootState) => state)
+    // console.log(lines);
 
     const terminalLines = useMemo( () => lines.map( (res, i) => {
         let node: ReactNode;
@@ -30,7 +31,7 @@ export default function Terminal() {
         }
         return <React.Fragment key={`node-${i}`}>{node}</React.Fragment>
     }) , [lines])
-    console.log(lines);
+      
     return (
         <div className='h-full px-5 pt-3 pb-[50%] overflow-y-scroll scrollbar-thin'>
             {terminalLines}

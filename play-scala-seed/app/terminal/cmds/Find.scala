@@ -1,12 +1,15 @@
 package terminal.cmds
 
+import akka.actor.ActorRef
+import managers.ActorRefManager.SendResponse
 import models.Response
 import os.{Path, StatInfo}
+import terminal.helpers.PathHelper
 
 import scala.util.{Failure, Success, Try}
 import scala.annotation.tailrec
 
-class Find(path: Path) extends Command {
+class Find(manager: ActorRef, path: Path) extends Command {
 	private case class Solver(file: Option[String], depth: Option[Int])
 	
 	@tailrec
@@ -24,17 +27,20 @@ class Find(path: Path) extends Command {
 	}
 	
 	private def findFile(file: String, depth: Int): Response = {
-		// TODO: res whenever we want outside return
-		// winux.add( s"Searching for '$file' with depth=$depth..." )
+		manager ! SendResponse(Response.Success(DataLine(
+			s"Searching for '$file' with depth=$depth..."
+		)))
 
 		def skip = (p: Path, stats: StatInfo) =>
 			stats.isFile && !p.baseName.startsWith(file)
 		
-		// TODO: same here -> stream the result
-		val content = os.walk.stream.attrs(path, skip, maxDepth=depth)
+		os.walk.stream.attrs(path, skip, maxDepth=depth)
 			.filter { case (p, s) => p.baseName.startsWith(file) }
+			.foreach { c => manager ! SendResponse(Response.Success(DataLine(
+				s"${PathHelper.getFileName(c, fullPath = true)}"
+			))) }
 			
-		Response.Nothing()
+		Response.Success(DataLine("done."))
 	}
 	
 	def handle(params: List[String]): Response = {

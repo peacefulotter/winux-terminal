@@ -23,7 +23,7 @@ class Terminal(manager: ActorRef) {
 			case "cat" => new Cat()
 			case "cd" => new Cd(path)
 			case "ls" => new Ls(path)
-			case "find" => new Find(path)
+			case "find" => new Find(manager, path)
 			case "history" => new HistoryCmd(history)
 			case _ => new Builtin(manager, keyword, path) // new Err(keyword)
 		}

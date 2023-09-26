@@ -19,32 +19,34 @@ import {
     ContentResponse,
     HistoryResponse,
     AutocompletionResponse,
-    CmdAction, 
+    CmdAction,
+    UIResponse, 
 } from "@/types";
 
+interface TerminalState { cmd: string, path: string }
 
 interface ContextProps {
-    cmd: string;
-    path: string;
+    state: TerminalState
     actions: Actions
     status: Status 
-    setCmd: Dispatch<SetStateAction<string>>
+    setCmd: (cmd: string) => void;
 }
 
 const TerminalContext = createContext({} as ContextProps);
 
 export const TerminalProvider = ({ children }: PropsWithChildren) => {
-    const [path, setPath] = useState<string>('D:\\')
-    const [cmd, setCmd] = useState<string>('')
+    const [state, setState] = useState<TerminalState>({ path: 'D:\\', cmd: '' })
+    const setCmd = (cmd: string) => setState( ({path}) => ({path, cmd}))
+    const setPath = (path: string) => setState( ({cmd}) => ({path, cmd}))
 
     const { sse, status } = useSSE()
 
     const fetch = <T extends FetchResponse,>(endpoint: string, callback: (data: T) => boolean) => () => {
-		return terminalFetch(endpoint, { cmd, path }, callback)
+		return terminalFetch(endpoint, state, callback)
 	}
     // Prevent sending request if cmd is empty
     const emptyMiddleware = ( f: CmdAction ) => () => {
-        if (cmd.trim().length === 0) {
+        if (state.cmd.trim().length === 0) {
             return Promise.resolve(true);
         }
         return f()
@@ -61,19 +63,25 @@ export const TerminalProvider = ({ children }: PropsWithChildren) => {
             if (status === Status.Success) {
                 setCmd(data.autocompletion)
                 if ( data.propositions !== null)
-                    addContent({name: 'flex', data: data.propositions})
+                    addContent({res: {name: 'flex', data: data.propositions}, addCmd: true})
             }
             return false
         } ),
 		'Enter': emptyMiddleware( fetch('/cmd', (res: ContentResponse | PathResponse) => {
             console.log(res)
+            
             if ( res.name === 'path' ) {
-                setPath(res.data)
+                addContent({addCmd: true})
+                setState({ cmd: '', path: res.data })
             }
-            else
-                addContent(res)
-
-            setCmd('')
+            else {
+                if ( res.status === Status.Nothing )
+                    addContent({addCmd: true})
+                else 
+                    addContent({res, addCmd: true})
+                setCmd('')
+            }
+            
             return true
         })),
 		'ArrowUp': fetch('/history/up', arrowCallback),
@@ -83,17 +91,16 @@ export const TerminalProvider = ({ children }: PropsWithChildren) => {
     useEffect( () => {
         if (sse === undefined) return;
         sse.onmessage = (test) => {
-            console.log('SSE ', test);
             const { data } = test
-            
-            const res = JSON.parse(data)
-            addContent(res)
+            const res = JSON.parse(data) as UIResponse
+            console.log(res);
+            addContent({res, addCmd: false})
         }
     }, [sse])
     
     return (
 		<TerminalContext.Provider
-			value={{ cmd, path, actions, status, setCmd }}
+			value={{ state, actions, status, setCmd }}
 		>
 			{children}
 		</TerminalContext.Provider>

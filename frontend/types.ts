@@ -5,7 +5,7 @@ import FlexLine from "./components/FlexLine";
 export enum Status { Success, Error, Nothing }
 
 type Response<T extends string, U> = {
-  status: Status.Success,
+  status: Status,
   name: T
 } & (U extends null | undefined ? { data?: U } : { data: U })
 
@@ -41,12 +41,3 @@ export type UIResponse = DistributiveOmit<(
 
 export type CmdAction = () => Promise<boolean>
 export type Actions = Record<string, CmdAction>
-
-
-export const Color = {
-  'success': 'text-success',
-  'error': 'text-error',
-  'info': 'text-info',
-  'file': 'text-file',
-  'directory': 'text-directory'
-} as const

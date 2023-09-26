@@ -1,5 +1,5 @@
 
-import { ChangeEventHandler, Dispatch, KeyboardEventHandler, SetStateAction, useEffect, useRef, useState } from "react"
+import { ChangeEventHandler, KeyboardEventHandler, useEffect, useMemo, useRef, useState } from "react"
 import { useTerminal } from "@/context/TerminalContext";
 import BaseCommandLine from "./BaseCommandLine";
 import FixedCommandLine from "./FixedCommandLine";
@@ -7,41 +7,52 @@ import FixedCommandLine from "./FixedCommandLine";
 
 export default function CommandLine() {
 
-    const [fixedData, setFixedData] = useState({cmd: '', path: '', isFixed: false})
-    const { cmd, path, actions, setCmd } = useTerminal()
+    const { state, actions, setCmd } = useTerminal()
+
+    const [disabled, setDisabled] = useState(false)
+    const [data, setData] = useState({cmd: '', path: ''})
 
     const ref = useRef<HTMLInputElement>(null);
-
     useEffect(() => {
-        if (ref.current) {
+        if (ref.current)
             ref.current.focus();
-        }
     }, []);
 
+    useEffect( () => {
+        if (!disabled)
+            setData(state)
+    }, [state, disabled] )
+
     const onChange: ChangeEventHandler<HTMLInputElement> = (e) => {
-      	setCmd(e.target.value)
+        setCmd(e.target.value)
     }
   
     const onKeyDown: KeyboardEventHandler<HTMLInputElement> = (e) => {
-        if (Object.keys(actions).includes(e.key)) {
-            e.preventDefault()
-            e.stopPropagation()
-            actions[e.key]().then(isFixed => {
-                setFixedData({isFixed, cmd, path})
-            })
-        }
+        if (!Object.keys(actions).includes(e.key)) return
+        
+        e.preventDefault()
+        e.stopPropagation()
+        setDisabled(true)
+        actions[e.key]().then(disabled => {            
+            setDisabled(disabled)
+            setTimeout( 
+                () => !disabled && ref.current && ref.current.focus(), 
+                10
+            )
+        })
     }
     
-    return fixedData.isFixed
-        ? <FixedCommandLine cmd={fixedData.cmd} path={fixedData.path} />
-        : <BaseCommandLine path={path}> 
+    return (
+        <BaseCommandLine path={data.path}> 
             <input 
+                disabled={disabled}
                 ref={ref}
                 className='bg-transparent text-foreground outline-none w-full' 
                 type='text' 
-                value={cmd} 
+                value={data.cmd} 
                 onChange={onChange}
                 onKeyDown={onKeyDown} />
         </BaseCommandLine>
+    )
 }
   

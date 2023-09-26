@@ -5,7 +5,7 @@ import managers.ActorRefManager.SendResponse
 import models.Response
 import os.{Path, SubProcess}
 
-import java.io.ByteArrayOutputStream
+import java.io.{ByteArrayOutputStream, IOException}
 import scala.language.postfixOps
 
 class Builtin(manager: ActorRef, cmd: String, path: Path) extends Command {
@@ -41,16 +41,19 @@ class Builtin(manager: ActorRef, cmd: String, path: Path) extends Command {
 	
 	def handle(params: List[String]): Response = {
 		try {
+			println(cmd :: params)
+			println(path)
 			os.proc(cmd :: params).spawn(
 				cwd = path,
 				env = Map("TERM" -> "xterm-color"),
 				stdout = processOut,
 				stderr = processErr
-			)
+			).join()
+			Response.Nothing()
 		}
 		catch {
-			case e: os.SubprocessException => println(e.getMessage)
+			case e: IOException => Response.Failure(e.getMessage)
+			case e: os.SubprocessException => Response.Failure(e.getMessage)
 		}
-		Response.Nothing()
 	}
 }

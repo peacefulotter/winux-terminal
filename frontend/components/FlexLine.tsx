@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
 
-import { Color } from "@/types";
 import Line from "./Line";
 
 
@@ -32,7 +31,7 @@ export default function FlexLine( { data }: IFlexLine ) {
     return (
       	<div ref={ref} className='grid' style={{gridTemplateColumns}}>
 			{ data.map( ([text, isDir], i) => 
-                <Line key={`line-${i}`} text={text} color={isDir ? Color.directory : Color.file} />
+                <Line key={`line-${i}`} text={text} color={isDir ? 'directory' : 'file'} />
             ) }
       	</div>
     )

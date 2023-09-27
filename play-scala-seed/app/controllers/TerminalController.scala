@@ -55,7 +55,7 @@ class TerminalController @Inject()(
 	}
 	
 	def history: Action[AnyContent] = Action { implicit request =>
-		getBody { (_, _, dir) => dir match {
+		getBody { (_, _, json) => json("dir") match {
 			case JsString("up") => terminal.history.arrowUp()
 			case JsString("down") => terminal.history.arrowDown()
 			case _ => Response.Failure("dir param must either be 'up' or 'down'")

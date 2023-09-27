@@ -82,7 +82,7 @@ export const TerminalProvider = ({ children }: PropsWithChildren) => {
         sse.onmessage = (test) => {
             const { data } = test
             const res = JSON.parse(data) as UIResponse
-            console.log(res);
+            console.log('SSE RES: ', res);
             addContent(res)
         }
     }, [sse])

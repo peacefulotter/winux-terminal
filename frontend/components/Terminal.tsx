@@ -32,9 +32,6 @@ export default function Terminal() {
         }
         return <React.Fragment key={`node-${i}`}>{node}</React.Fragment>
     }) , [lines])
-
-    console.log(terminalLines);
-    
       
     return (
         <div className='h-full px-5 pt-3 pb-[50%] overflow-y-scroll scrollbar-thin'>

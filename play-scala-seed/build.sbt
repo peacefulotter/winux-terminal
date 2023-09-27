@@ -9,11 +9,11 @@ lazy val root = (project in file("."))
 
 scalaVersion := "2.13.10"
 
+resolvers += "JetBrains IntelliJ Dependencies" at "https://packages.jetbrains.team/maven/p/ij/intellij-dependencies"
 libraryDependencies += guice
 libraryDependencies += "org.scalatestplus.play" %% "scalatestplus-play" % "5.1.0" % Test
 libraryDependencies += "com.lihaoyi" %% "os-lib" % "0.9.1"
-// libraryDependencies += "com.github.tototoshi" %% "play-json-generic" % "0.1.2"
-
+libraryDependencies += "org.jetbrains.pty4j" % "pty4j" % "0.12.13"
 // Adds additional packages into Twirl
 //TwirlKeys.templateImports += "com.example.controllers._"
 

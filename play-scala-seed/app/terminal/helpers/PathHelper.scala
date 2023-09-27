@@ -6,9 +6,15 @@ import scala.util.{Success, Try}
 object PathHelper {
 	def getFileName(file: (Path, StatInfo), fullPath: Boolean = false): String = file match {
 		case (path, attrs) =>
-			(if (fullPath) path.toString else path.baseName) +
-				(if (attrs.isDir) "/" else "." + path.ext)
+			if (fullPath) path.toString
+			else path.baseName + (
+				if (attrs.isDir) "/"
+				else "." + path.ext
+			)
 	}
+	
+	def withExtension(path: Path): String =
+		s"${path.baseName}.${path.ext}"
 	
 	def getSubPath(path: Path, str: String): Try[Path] = 
 		if (str.isEmpty)

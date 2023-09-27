@@ -30,15 +30,18 @@ class Find(manager: ActorRef, path: Path) extends Command {
 		manager ! SendResponse(Response.Success(DataLine(
 			s"Searching for '$file' with depth=$depth..."
 		)))
-
-		def skip = (p: Path, stats: StatInfo) =>
-			stats.isFile && !p.baseName.startsWith(file)
+		
+		def skip: (Path, StatInfo) => Boolean = (p: Path, stats: StatInfo) => {
+			stats.isFile && !PathHelper.withExtension(p).matches(file)
+		}
 		
 		os.walk.stream.attrs(path, skip, maxDepth=depth)
-			.filter { case (p, s) => p.baseName.startsWith(file) }
-			.foreach { c => manager ! SendResponse(Response.Success(DataLine(
-				s"${PathHelper.getFileName(c, fullPath = true)}"
-			))) }
+			.filter { case (p, s) => s.isFile }
+			.foreach { c =>
+				manager ! SendResponse(Response.Success(DataLine(
+					PathHelper.getFileName(c, fullPath = true)
+				)))
+			}
 			
 		Response.Success(DataLine("done."))
 	}

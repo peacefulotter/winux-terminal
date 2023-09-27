@@ -1,24 +1,17 @@
 import { PayloadAction, configureStore, createSlice } from "@reduxjs/toolkit"
-import { UIResponse } from "@/types"
+import { TerminalState, UIResponse } from "@/types"
 
-
-type Payload = {
-    res?: UIResponse,
-    addCmd: boolean
-}
 
 const Slice = createSlice({
     name: 'lines',
-    initialState: [
-        { name: 'cmd' }
-    ] as UIResponse[],
+    initialState: [] as UIResponse[],
     reducers: {
-        add: (state, action: PayloadAction<Payload>) => {
-            console.log("adding content ", action.payload);
-            if (action.payload.res)
-                state.push( action.payload.res )
-            if (action.payload.addCmd)
-                state.push({ name: 'cmd' })
+        add: (state, { payload }: PayloadAction<UIResponse>) => {
+            console.log("adding content ", payload);
+            state.push(payload)
+        },
+        addFixedCmd: (state, { payload }: PayloadAction<TerminalState>) => {
+            state.push({ name: 'cmd', data: payload })
         }
     }
 } )
@@ -29,5 +22,8 @@ const store = configureStore({ reducer })
 export default store
 export type RootState = ReturnType<typeof store.getState>
 
-export const addContent = (payload: Payload) => 
+export const addContent = (payload: UIResponse) => 
     store.dispatch(actions.add(payload))
+
+export const addFixedCmd = (payload: TerminalState) => 
+    store.dispatch(actions.addFixedCmd(payload))

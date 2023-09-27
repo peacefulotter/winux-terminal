@@ -4,6 +4,11 @@ import FlexLine from "./components/FlexLine";
 
 export enum Status { Success, Error, Nothing }
 
+export type TerminalState = { 
+  path: string 
+  cmd: string, 
+}
+
 type Response<T extends string, U> = {
   status: Status,
   name: T
@@ -33,11 +38,10 @@ type DistributiveKeys<T> = T extends unknown ? Keys<T> : never;
 export type DistributiveOmit<T, K extends DistributiveKeys<T>> =
   T extends unknown ? Omit<T, Extract<keyof T, K>> : never;
 
-export type UIResponse = DistributiveOmit<(
-  ContentResponse 
-  | Response<'cmd', undefined>
-), 'status'>
+type FixedCmdResponse = Response<"cmd", TerminalState>
+export type UIResponse = DistributiveOmit<
+  (ContentResponse | FixedCmdResponse), 'status'
+>
 
-
-export type CmdAction = () => Promise<boolean>
-export type Actions = Record<string, CmdAction>
+export type CmdAction<T> = (state: TerminalState) => Promise<T>
+export type Actions<T = void> = Record<string, CmdAction<T>>

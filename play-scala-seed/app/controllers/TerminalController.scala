@@ -32,18 +32,12 @@ class TerminalController @Inject()(
 	private[this] val manager = system.actorOf(ActorRefManager.props)
 	private[this] val terminal = new Terminal(manager)
 	
-	// manager ! SendResponse(response)
-	
-	def get: Action[AnyContent] = Action { implicit request =>
-		Ok("GET Got request [" + request + "]")
-	}
-	
-	private def getBody(f: (String, Path) => Response)(implicit request: Request[AnyContent]): Result =
+	private def getBody(f: (String, Path, JsValue) => Response)(implicit request: Request[AnyContent]): Result =
 		request.body.asJson match {
 			case Some(body) =>
 				val (cmd, path) = (body("cmd").as[String], body("path").as[String])
 				println(s"$cmd, $path")
-				val json = f(cmd, Path(path)).toJson
+				val json = f(cmd, Path(path), body).toJson
 				println(s"final json $json")
 				Ok(json)
 			case None =>
@@ -51,21 +45,21 @@ class TerminalController @Inject()(
 		}
 	
 	def cmd: Action[AnyContent] = Action { implicit request =>
-		getBody { (cmd, path) => terminal.handleCommand(cmd, path) }
+		getBody { (cmd, path, _) => terminal.handleCommand(cmd, path) }
 	}
 	
 	def autocomplete: Action[AnyContent] = Action { implicit request =>
-		getBody { (cmd, path) =>
+		getBody { (cmd, path, _) =>
 			terminal.autocomplete.handle(cmd, path)
 		}
 	}
 	
-	def up: Action[AnyContent] = Action { implicit request =>
-		getBody { (_, _) => terminal.history.arrowUp() }
-	}
-	
-	def down: Action[AnyContent] = Action { implicit request =>
-		getBody { (_, _) => terminal.history.arrowDown() }
+	def history: Action[AnyContent] = Action { implicit request =>
+		getBody { (_, _, dir) => dir match {
+			case JsString("up") => terminal.history.arrowUp()
+			case JsString("down") => terminal.history.arrowDown()
+			case _ => Response.Failure("dir param must either be 'up' or 'down'")
+		} }
 	}
 	
 	def sse: Action[AnyContent] = Action {

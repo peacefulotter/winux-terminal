@@ -8,17 +8,15 @@ import store from '@/redux/store';
 
 export default function Home() {
   return (
-    <main className="flex h-screen flex-col items-center justify-center px-32 gap-2 font-mono overflow-hidden">
+    <main className="flex h-screen flex-col items-center justify-center px-32 gap-8 font-mono overflow-hidden">
       <Welcome />
-      <div className='w-full rounded-3xl p-2 bg-gradient-to-br from-fuchsia-800 to-sky-800 mt-3'>
-        <div className='w-full h-[70vh] flex flex-col rounded-2xl border border-neutral-800 bg-background overflow-hidden'>
-          <Provider store={store}>
-            <TerminalProvider>
-              <ConnectionStatus />
-              <Terminal />
-            </TerminalProvider>
-          </Provider>
-        </div>
+      <div className='w-full h-[80vh] rounded-2xl flex flex-col border-2 border-sky-950 bg-background overflow-hidden'>
+        <Provider store={store}>
+          <TerminalProvider>
+            <ConnectionStatus />
+            <Terminal />
+          </TerminalProvider>
+        </Provider>
       </div>
     </main>
   )

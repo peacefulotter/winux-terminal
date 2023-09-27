@@ -6,6 +6,7 @@ import os.Path
 import terminal.cmds._
 import terminal.features.{Autocomplete, History}
 import terminal.helpers.InputHelper.parseInput
+import terminal.stream.{Basic, Grep, LineStreamHandler}
 
 class Terminal(manager: ActorRef) {
 	// features
@@ -20,7 +21,7 @@ class Terminal(manager: ActorRef) {
 		
 		val (keyword, params) = (input.head, input.tail)
 		val cmd: Command = keyword match {
-			case "cat" => new Cat()
+			case "cat" => new Cat(this, path)
 			case "cd" => new Cd(path)
 			case "ls" => new Ls(path)
 			case "find" => new Find(manager, path)
@@ -40,6 +41,17 @@ class Terminal(manager: ActorRef) {
 			case _ => Response.Nothing()
 		}
 	}
+
+	val defaultStreamHandler: LineStreamHandler = new Basic(manager)
+	
+	def getStreamHandler(params: List[String]): LineStreamHandler = params match {
+		case cmd :: xs => cmd match {
+			case "grep" => new Grep(manager, xs)
+			case _ => defaultStreamHandler
+		}
+		case _ => defaultStreamHandler
+	}
+	
 	
 	private def handleKill(): Unit = println("===== killing")
 }

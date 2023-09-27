@@ -37,8 +37,9 @@ export default function CommandLine() {
             e.preventDefault()
             e.stopPropagation()
             setDisabled(true)
-            contentActions[e.key]({path, cmd}).then(({path}) => {    
-                setCmd('')        
+            const prevCmd = cmd
+            setCmd('')
+            contentActions[e.key]({path, cmd: prevCmd}).then(({path}) => {    
                 setPath(path)
                 setDisabled(false)
             })
@@ -50,7 +51,7 @@ export default function CommandLine() {
             <input 
                 disabled={disabled}
                 ref={ref}
-                className='bg-transparent text-foreground outline-none w-full' 
+                className='bg-transparent text-foreground outline-none w-full disabled:hidden' 
                 type='text' 
                 value={cmd} 
                 onChange={onChange}

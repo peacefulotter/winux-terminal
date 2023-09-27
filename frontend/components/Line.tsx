@@ -1,3 +1,4 @@
+import Ansi from "ansi-to-react";
 
 interface ILine {
     text: string;
@@ -18,7 +19,7 @@ export default function Line( { text, color }: ILine ) {
     const colorClass = color ? Color[color] : Color['foreground']
     return (
       	<div className={`${colorClass} max-w-min whitespace-nowrap`}>
-			<pre>{text}</pre>
+			<pre><Ansi>{text}</Ansi></pre>
       	</div>
     )
 }

@@ -36,9 +36,9 @@ export default function FlexLine( { data }: IFlexLine ) {
       	<div ref={ref} className='grid' style={{gridTemplateColumns}}>
 			{ data.map( (elt, i) => {
                 if (isStringBooleanTuple(elt))
-                    return <Line key={`line-${i}`} text={elt[0]} color={elt[1] ? 'directory' : 'file'} />
+                    return <Line key={`line-${i}`} text={elt[0]} color={elt[1] ? 'directory' : 'file'} fromFlex={true} />
                 else
-                    return <Line key={`line-${i}`} text={elt} />
+                    return <Line key={`line-${i}`} text={elt} fromFlex={true} />
             }) }
       	</div>
     )

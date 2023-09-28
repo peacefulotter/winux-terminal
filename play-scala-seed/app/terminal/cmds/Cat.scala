@@ -1,7 +1,7 @@
 package terminal.cmds
 
 import models.Response
-import os.Path
+import os.{Path, RelPath}
 import terminal.Terminal
 import terminal.stream.LineStreamHandler
 
@@ -30,7 +30,7 @@ class Cat(terminal: Terminal, path: Path) extends Command {
 	}
 	
 	private def streamRead(file: String): os.Generator[String] =
-		os.read.lines.stream( path / file )
+		os.read.lines.stream( path / RelPath(file) )
 	
 	def handle(params: List[String]): Response = parseParams(params) match {
 		case Params(Some(file), out) =>

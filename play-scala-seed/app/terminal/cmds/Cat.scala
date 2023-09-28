@@ -5,6 +5,8 @@ import os.Path
 import terminal.Terminal
 import terminal.stream.LineStreamHandler
 
+import scala.annotation.tailrec
+
 class Cat(terminal: Terminal, path: Path) extends Command {
 	
 	private case class Params(
@@ -12,6 +14,7 @@ class Cat(terminal: Terminal, path: Path) extends Command {
 		                         out: LineStreamHandler = terminal.defaultStreamHandler
 	                         )
 	
+	@tailrec
 	private def parseParams(params: List[String], parsed: Params = Params()): Params = params match {
 		case x :: xs =>
 			if (parsed.file.isEmpty)
@@ -31,7 +34,9 @@ class Cat(terminal: Terminal, path: Path) extends Command {
 	
 	def handle(params: List[String]): Response = parseParams(params) match {
 		case Params(Some(file), out) =>
-			streamRead(file).foreach(out.processLine)
+			streamRead(file).zipWithIndex.foreach {
+				case (line, i) => out.processLine(line, i)
+			}
 			out.done()
 		case _ => Response.Failure("cat requires a filename")
 	}

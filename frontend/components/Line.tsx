@@ -14,13 +14,13 @@ export const Color = {
     'file': 'text-file',
     'directory': 'text-directory'
 } as const
-  
+
 export default function Line( { text, color }: ILine ) {
     const colorClass = color ? Color[color] : Color['foreground']
     return (
-      	<div className={`${colorClass} max-w-min whitespace-nowrap`}>
-			<pre><Ansi>{text}</Ansi></pre>
-      	</div>
+        <div className={`${colorClass} max-w-min whitespace-nowrap`}>
+            <Ansi useClasses>{text}</Ansi>
+        </div>      	
     )
 }
   

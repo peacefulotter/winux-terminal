@@ -7,6 +7,10 @@ interface IFlexLine {
     data: [string, boolean][];
 }
 
+function isStringBooleanTuple(value: any): value is [string, boolean] {
+    return Array.isArray(value) && value.length === 2 && typeof value[0] === 'string' && typeof value[1] === 'boolean';
+}
+
 export default function FlexLine( { data }: IFlexLine ) {
     const ref = useRef<HTMLDivElement>(null)
     const [gridTemplateColumns, setGridTemplateColumns] = useState('')
@@ -30,9 +34,12 @@ export default function FlexLine( { data }: IFlexLine ) {
 
     return (
       	<div ref={ref} className='grid' style={{gridTemplateColumns}}>
-			{ data.map( ([text, isDir], i) => 
-                <Line key={`line-${i}`} text={text} color={isDir ? 'directory' : 'file'} />
-            ) }
+			{ data.map( (elt, i) => {
+                if (isStringBooleanTuple(elt))
+                    return <Line key={`line-${i}`} text={elt[0]} color={elt[1] ? 'directory' : 'file'} />
+                else
+                    return <Line key={`line-${i}`} text={elt} />
+            }) }
       	</div>
     )
 }

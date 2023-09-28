@@ -14,6 +14,8 @@ libraryDependencies += guice
 libraryDependencies += "org.scalatestplus.play" %% "scalatestplus-play" % "5.1.0" % Test
 libraryDependencies += "com.lihaoyi" %% "os-lib" % "0.9.1"
 libraryDependencies += "org.jetbrains.pty4j" % "pty4j" % "0.12.13"
+libraryDependencies += "com.lihaoyi" %% "fansi" % "0.4.0"
+
 // Adds additional packages into Twirl
 //TwirlKeys.templateImports += "com.example.controllers._"
 

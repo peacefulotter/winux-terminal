@@ -6,3 +6,35 @@ body {
   color: white;
   background: black;
 }
+
+
+.ansi-black-fg { @apply text-black }
+.ansi-red-fg { @apply text-red-600 }
+.ansi-green-fg { @apply text-green-600 }
+.ansi-yellow-fg { @apply text-yellow-600 }
+.ansi-blue-fg { @apply text-blue-600 }
+.ansi-magenta-fg { @apply text-purple-600 }
+.ansi-cyan-fg { @apply text-cyan-600 }
+.ansi-white-fg { @apply text-neutral-100 }
+
+.ansi-bright-black-fg { @apply text-slate-500 }
+.ansi-bright-red-fg { @apply text-red-400 }
+.ansi-bright-green-fg { @apply text-green-400 }
+.ansi-bright-yellow-fg { @apply text-yellow-400 }
+.ansi-bright-blue-fg { @apply text-blue-400 }
+.ansi-bright-magenta-fg { @apply text-fuchsia-500 }
+.ansi-bright-cyan-fg { @apply text-cyan-400 }
+.ansi-bright-white-fg { @apply text-white }
+
+.ansi-black-bg { @apply bg-black }
+.ansi-red-bg { @apply bg-red-800 }
+.ansi-green-bg { @apply bg-green-800 }
+.ansi-yellow-bg { @apply bg-yellow-800 }
+.ansi-blue-bg { @apply bg-blue-800 }
+.ansi-magenta-bg { @apply bg-purple-800 }
+.ansi-cyan-bg { @apply bg-cyan-800 }
+.ansi-white-bg { @apply bg-neutral-50 }
+
+.ansi-bold { @apply font-bold }
+.ansi-underline { @apply underline }
+

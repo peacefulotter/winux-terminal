@@ -61,7 +61,8 @@ export const TerminalProvider = ({ children }: PropsWithChildren) => {
         ({status, data}: AutocompletionResponse) => {
             if (status === Status.Success && data.propositions !== null)
                 addContent({ name: 'flex', data: data.propositions })
-            return { status, cmd: data.autocompletion }
+            const cmd = status === Status.Nothing ? state.cmd : data.autocompletion
+            return { status, cmd }
         }
     )
     

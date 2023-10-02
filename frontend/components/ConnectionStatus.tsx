@@ -1,4 +1,4 @@
-import { useTerminal } from "@/context/TerminalContext"
+import { useSSE } from "@/context/SSEContext"
 import { Status } from "@/types"
 
 const states = {
@@ -8,10 +8,10 @@ const states = {
 } as const
 
 export default function ConnectionStatus() {
-    const { status } = useTerminal()
+    const { status } = useSSE()
     const [color, text] = states[status]
     return (
-        <div className='flex items-center gap-3 px-8 py-2 bg-background-dark'>
+        <div className='flex items-center gap-3 px-8 py-2'>
             <div className='rounded-full h-2 w-2' style={{backgroundColor: color}}></div>
             <div className='text-slate-300 font-bold'>{text}</div>
         </div>

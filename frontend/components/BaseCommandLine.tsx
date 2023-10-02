@@ -1,9 +1,16 @@
 
+import { Status } from "@/types"
 import { PropsWithChildren } from "react"
 
 interface Props {
     path: string
     className: string
+}
+
+const statusEmojiMap: Record<Status, string> = {
+    [Status.Success]: '✔️',
+    [Status.Error]:   '❌',
+    [Status.Nothing]: '', // ⚠️
 }
 
 export default function BaseCommandLine({path, className, children}: PropsWithChildren<Props>) {
@@ -14,7 +21,7 @@ export default function BaseCommandLine({path, className, children}: PropsWithCh
                 <p className='text-dollar'>$</p>
                 {children}
             </div>
-			<div>status</div>
+			<div>{statusEmojiMap[Status.Nothing]}</div>
       	</div>
     )
 }

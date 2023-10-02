@@ -1,14 +1,27 @@
 
-import { ChangeEventHandler, KeyboardEventHandler, useEffect, useRef, useState } from "react"
-import { useTerminal } from "@/context/TerminalContext";
-import { Status } from "@/types";
+import { ChangeEventHandler, KeyboardEvent, KeyboardEventHandler, useEffect, useRef, useState } from "react"
+import { cmdActions, contentActions } from "@/redux/actions";
+import { Actions, Status } from "@/types";
 import BaseCommandLine from "./BaseCommandLine";
+import { useSelector } from "react-redux";
+import { RootState, addFixedCmd, setPath } from "@/redux/store";
 
-export default function CommandLine() {
+interface ICommandLine {
+    session: number;
+}
 
-    const { cmdActions, contentActions } = useTerminal()
-    
-    const [path, setPath] = useState<string>('D:\\')
+const activateActionMiddleware = <T,>(a: Actions<T>, e: KeyboardEvent<HTMLInputElement>) => {
+    const res = Object.keys(a).includes(e.key)
+    if (res) {
+        e.preventDefault()
+        e.stopPropagation()
+    }
+    return res
+}
+
+export default function CommandLine({ session }: ICommandLine) {    
+
+    const path = useSelector((state: RootState) => state[session].path)
     const [cmd, setCmd] = useState<string>('')
     const [disabled, setDisabled] = useState(false)
 
@@ -24,23 +37,24 @@ export default function CommandLine() {
     }
   
     const onKeyDown: KeyboardEventHandler<HTMLInputElement> = (e) => {
-        if (Object.keys(cmdActions).includes(e.key)) {
-            e.preventDefault()
-            e.stopPropagation()
-            cmdActions[e.key]({path, cmd}).then(({status, cmd}) => {
-                if (status === Status.Success)
-                    setCmd(cmd)
+        if (activateActionMiddleware(cmdActions, e)) {
+            cmdActions[e.key]({path, cmd, session}).then(res => {
+                if (res !== undefined && res.status === Status.Success)
+                    setCmd(res.cmd)
             })
         }
 
-        else if (Object.keys(contentActions).includes(e.key)) {
-            e.preventDefault()
-            e.stopPropagation()
+        else if (
+            activateActionMiddleware(contentActions, e) &&
+            cmd.trim().length === 0
+        ) {
+            addFixedCmd({ cmd, path, session })
             setDisabled(true)
             const prevCmd = cmd
             setCmd('')
-            contentActions[e.key]({path, cmd: prevCmd}).then(({path}) => {    
-                setPath(path)
+            contentActions[e.key]({path, cmd: prevCmd, session}).then(res => {
+                if (res === undefined) return    
+                setPath({ session, path })
                 setDisabled(false)
             })
         }

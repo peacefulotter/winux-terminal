@@ -10,15 +10,17 @@ import ListLine from "./ListLine"
 import FlexLine from "./FlexLine"
 import FixedCommandLine from "./FixedCommandLine"
 
-export default function Terminal() {
-    const lines = useSelector((state: RootState) => state)
-    // console.log(lines);
+interface ITerminal { session: number }
 
-    const terminalLines = useMemo( () => lines.map( (res, i) => {
+export default function Terminal({ session }: ITerminal) {
+    
+    const content = useSelector((state: RootState) => state[session].content)
+
+    const terminalLines = useMemo( () => content.map( (res, i) => {
         let node: ReactNode;
         switch (res.name) {
             case 'cmd':
-                node = <FixedCommandLine {...res.data} />
+                node = <FixedCommandLine {...res.data} session={session} />
                 break;
             case "line":
                 node = <Line text={res.data} />
@@ -31,12 +33,12 @@ export default function Terminal() {
                 break
         }
         return <React.Fragment key={`node-${i}`}>{node}</React.Fragment>
-    }) , [lines])
+    }) , [content])
       
     return (
-        <div className='h-full px-5 pt-3 pb-[50%] overflow-y-scroll scrollbar-thin'>
+        <div className='h-full pt-3 pb-[50%] overflow-y-scroll scrollbar-thin'>
             {terminalLines}
-            <CommandLine />
+            <CommandLine session={session} />
         </div>
     )
 }

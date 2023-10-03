@@ -29,7 +29,7 @@ class Terminal(manager: ActorRef) {
 			case "colors" => new Colors()
 			case "system" => new System()
 			case "top" => new Top()
-			case _ => new Builtin(manager, keyword, path) // new Err(keyword)
+			case _ => new Builtin(keyword, path) // new Err(keyword)
 		}
 		(Some(cmd), params)
 	}

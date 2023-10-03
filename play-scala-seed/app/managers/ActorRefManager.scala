@@ -14,7 +14,7 @@ class ActorRefManager extends Actor {
         case UnRegister(_) => context.become(onMessage(None))
         case SendResponse(res) => actor match {
             case Some(ref) =>
-                println(f"Manager sending res: ${res.toJson.toString()}")
+                /// println(f"Manager sending res: ${res.toJson.toString()}")
                 ref ! res.toJson.toString()
             case None => ;
         }

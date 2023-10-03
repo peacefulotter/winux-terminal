@@ -62,7 +62,7 @@ export default function CommandLine({ session }: ICommandLine) {
     }
     
     return (
-        <BaseCommandLine path={path} className='bg-sky-950'>
+        <BaseCommandLine path={path} className='bg-sky-950 p-2 rounded-lg my-2'>
             <input 
                 disabled={disabled}
                 ref={ref}

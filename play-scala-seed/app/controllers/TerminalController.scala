@@ -36,7 +36,7 @@ class TerminalController @Inject()(
 		request.body.asJson match {
 			case Some(body) =>
 				val (cmd, path) = (body("cmd").as[String], body("path").as[String])
-				println(s"$cmd, $path")
+				println(s"CMD: $cmd, PATH: $path")
 				val json = f(cmd, Path(path), body).toJson
 				println(s"final json $json")
 				Ok(json)

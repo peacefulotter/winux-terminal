@@ -14,7 +14,7 @@ export default function Home() {
   return (
     <NextUIProvider>
     <SSEProvider>
-      <main className="flex h-screen flex-col items-center justify-center px-32 gap-8 font-mono overflow-hidden">
+      <main className="dark flex h-screen flex-col items-center justify-center px-32 gap-8 font-mono overflow-hidden">
         <div className='flex gap-4'>
           <Welcome />
           <ConnectionStatus />

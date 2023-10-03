@@ -9,6 +9,7 @@ import Line from "./Line"
 import ListLine from "./ListLine"
 import FlexLine from "./FlexLine"
 import FixedCommandLine from "./FixedCommandLine"
+import CTable from "./Table"
 
 interface ITerminal { session: number }
 
@@ -35,10 +36,13 @@ export default function Terminal({ session }: ITerminal) {
         return <React.Fragment key={`node-${i}`}>{node}</React.Fragment>
     }) , [content])
       
+
+    
     return (
         <div className='pb-[50%] overflow-y-scroll scrollbar-thin'>
             {terminalLines}
             <CommandLine session={session} />
+            <CTable />
         </div>
     )
 }

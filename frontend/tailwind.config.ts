@@ -1,6 +1,19 @@
 import type { Config } from 'tailwindcss'
 import { nextui } from '@nextui-org/react';
 
+const colors = {
+  background: '#1E2838',
+  'background-dark': '#0E1828',
+  foreground: '#FFFFFF',
+  dollar: '#787878',
+  path: '#32C864',
+  directory: '#3264DC',
+  file: '#8246B4',
+  success: '#32DC32',
+  error: '#DC3232',
+  info: '#3232DC',
+}
+
 const config: Config = {
   content: [
     './pages/**/*.{js,ts,jsx,tsx,mdx}',
@@ -10,24 +23,13 @@ const config: Config = {
   ],
   theme: {
     extend: {
-      colors: {
-        background: '#1E2838',
-        'background-dark': '#0E1828',
-        foreground: '#FFFFFF',
-        dollar: '#787878',
-        path: '#32C864',
-        directory: '#3264DC',
-        file: '#8246B4',
-        success: '#32DC32',
-        error: '#DC3232',
-        info: '#3232DC',
-      },
+      colors: { ...colors },
     }
   },
   darkMode: "class",
   plugins: [
     require('tailwind-scrollbar'), // ({ nocompatible: true })
-    nextui()
+    nextui(),
   ],
 }
 export default config

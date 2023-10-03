@@ -36,7 +36,7 @@ export default function TabsProvider({ children }: ITabsProvider) {
     }
 
     return (
-        <div className="flex w-full flex-col text-white max-h-full">
+        <div className="p-2 flex w-full flex-col text-white max-h-full">
             <Tabs 
                 aria-label="Dynamic tabs" 
                 variant='light' 
@@ -45,10 +45,10 @@ export default function TabsProvider({ children }: ITabsProvider) {
                 onSelectionChange={onSelectionChange} 
                 classNames={{
                     panel: 'h-full overflow-y-scroll ',
-                    tab: 'last:w-12 last:bg-background',
-                    cursor: 'rounded-lg',
-                    tabList: 'bg-background-dark w-full rounded-none p-2',
-                    tabContent: "w-fit group-data-[selected=true]:text-sky-500 last:text-neutral-300",
+                    tab: 'bg-background-dark data-[selected=true]:bg-background-dark/60 data-[selected=true]:border border-sky-950 last:w-12',
+                    cursor: 'bg-transparent rounded-lg',
+                    tabList: 'w-full rounded-none',
+                    tabContent: "w-fit group-data-[selected=true]:text-path last:text-neutral-300",
                 }}
             >
                 {({ session, label }) => (

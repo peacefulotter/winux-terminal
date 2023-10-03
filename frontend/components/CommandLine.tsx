@@ -46,7 +46,7 @@ export default function CommandLine({ session }: ICommandLine) {
 
         else if (
             activateActionMiddleware(contentActions, e) &&
-            cmd.trim().length === 0
+            cmd.trim().length > 0
         ) {
             addFixedCmd({ cmd, path, session })
             setDisabled(true)
@@ -54,7 +54,8 @@ export default function CommandLine({ session }: ICommandLine) {
             setCmd('')
             contentActions[e.key]({path, cmd: prevCmd, session}).then(res => {
                 if (res === undefined) return    
-                setPath({ session, path })
+                console.log("Content action command line: ", res);
+                setPath({ session, path: res.path })
                 setDisabled(false)
             })
         }

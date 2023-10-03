@@ -15,7 +15,8 @@ libraryDependencies += "org.scalatestplus.play" %% "scalatestplus-play" % "5.1.0
 libraryDependencies += "com.lihaoyi" %% "os-lib" % "0.9.1"
 libraryDependencies += "org.jetbrains.pty4j" % "pty4j" % "0.12.13"
 libraryDependencies += "com.lihaoyi" %% "fansi" % "0.4.0"
-
+libraryDependencies += "com.github.oshi" % "oshi-core" % "6.4.0"
+libraryDependencies +=  "ch.qos.logback" % "logback-classic" % "1.4.7"
 // Adds additional packages into Twirl
 //TwirlKeys.templateImports += "com.example.controllers._"
 

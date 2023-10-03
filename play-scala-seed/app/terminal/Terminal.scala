@@ -27,6 +27,7 @@ class Terminal(manager: ActorRef) {
 			case "find" => new Find(manager, path)
 			case "history" => new HistoryCmd(history)
 			case "colors" => new Colors()
+			case "system" => new System()
 			case "top" => new Top()
 			case _ => new Builtin(manager, keyword, path) // new Err(keyword)
 		}

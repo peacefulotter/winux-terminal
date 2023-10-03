@@ -22,6 +22,8 @@ const Slice = createSlice({
         },
         setPath: (state, { payload }: PayloadAction<PathPayload>) => {
             const { session, path } = payload
+            console.log(session, path, state[session]);
+            
             state[session].path = path
         },
         addTab: (state) => {

@@ -48,18 +48,3 @@ export type UIResponse = DistributiveOmit<
 
 export type CmdAction<T> = (state: TerminalState) => Promise<T>
 export type Actions<T = void> = Record<string, CmdAction<T | undefined>>
-
-
-/*
-GDOC
-
-benchmark run gpt-tfjs
-try browser and node
-tokens per sequence
-gpu vs cpu
-100M params
-
-DISCO: 
-hugo
-text task
-*/

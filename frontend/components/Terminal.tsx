@@ -36,7 +36,7 @@ export default function Terminal({ session }: ITerminal) {
     }) , [content])
       
     return (
-        <div className='h-full pt-3 pb-[50%] overflow-y-scroll scrollbar-thin'>
+        <div className='pb-[50%] overflow-y-scroll scrollbar-thin'>
             {terminalLines}
             <CommandLine session={session} />
         </div>

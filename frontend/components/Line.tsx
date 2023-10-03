@@ -19,9 +19,10 @@ export const Color = {
 export default function Line( { text, color, fromFlex }: ILine ) {
     const colorClass = color ? Color[color] : Color['foreground']
     const flexClass = fromFlex ? 'max-w-min whitespace-nowrap' : 'w-full'
+    console.log(text);
     return (
         <div className={`${colorClass} ${flexClass}`}>
-            <Ansi useClasses>{text}</Ansi>
+            <pre><Ansi useClasses>{text}</Ansi></pre>
         </div>      	
     )
 }

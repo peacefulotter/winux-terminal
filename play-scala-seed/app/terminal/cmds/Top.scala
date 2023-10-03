@@ -6,6 +6,7 @@ import terminal.helpers.PathHelper
 
 import scala.util.{Failure, Success}
 import com.sun.management.OperatingSystemMXBean
+import oshi.SystemInfo
 
 import java.lang.management.ManagementFactory
 import java.time.format.DateTimeFormatter

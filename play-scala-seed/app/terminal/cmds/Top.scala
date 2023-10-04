@@ -50,6 +50,9 @@ class Top(manager: ActorRef, session: Int)(implicit system: ActorSystem, implici
 			})
 			.sortBy { -_._2 }
 		
+		
+		// TODO: keys, Map(keys -> List[String], unique -> OneOf[keys])
+		// TODO: values must be Map(value -> ?, formatted: String)
 		println(s"CPU Load:  process ${bean.getProcessCpuLoad}%, system ${bean.getSystemCpuLoad}%")
 		println("TOTAL: " + currentProcesses.map { _._2 }.sum)
 		val table: Seq[Map[String, String]] = currentProcesses.map(e => Map(

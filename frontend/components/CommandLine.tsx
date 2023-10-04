@@ -66,7 +66,7 @@ export default function CommandLine({ session }: ICommandLine) {
         return null
     
     return (
-        <BaseCommandLine path={path} className='bg-sky-950 p-2 rounded-lg my-2'>
+        <BaseCommandLine path={path} className='bg-sky-950 p-2 border border-transparent rounded-lg my-2 focus-within:border-neutral-100/10 transition-colors'>
             <input 
                 disabled={disabled}
                 ref={ref}

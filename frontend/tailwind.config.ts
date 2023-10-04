@@ -24,6 +24,9 @@ const config: Config = {
   theme: {
     extend: {
       colors: { ...colors },
+      boxShadow: {
+        'terminal': `inset 0 -35px 60px -15px ${colors.background}`,
+      }
     }
   },
   darkMode: "class",

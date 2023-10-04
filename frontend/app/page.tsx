@@ -19,7 +19,7 @@ export default function Home() {
           <Welcome />
           <ConnectionStatus />
         </div>
-        <div className='w-full h-[80vh] rounded-2xl flex flex-col border-2 border-sky-950 bg-background overflow-hidden'>
+        <div className='relative w-full h-[80vh] rounded-2xl flex flex-col border-2 border-sky-950 bg-background overflow-hidden'>
           <Provider store={store}>
             <TabsProvider>
               {session => <Terminal session={session}/>}

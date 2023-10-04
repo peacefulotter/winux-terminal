@@ -1,5 +1,6 @@
 import { SortDescriptor, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from "@nextui-org/react";
 import { Key, useCallback, useMemo, useState } from "react";
+import Line from "./Line";
 
 type TableList = Record<string, string>
 
@@ -17,7 +18,7 @@ export default function TableLine<T extends TableList>({ data }: ITable<T>) {
     const [descriptor, setDescriptor] = useState<SortDescriptor>(getDescriptor(data))
 
     const renderCell = useCallback( (t: T, columnKey: Key) => {
-        return <div className="">{t[columnKey as keyof T]}</div>
+        return <Line text={t[columnKey as keyof T]} />
     }, []);
     
     const sortedItems = useMemo(() => [...data].sort((a, b) => {
@@ -39,22 +40,18 @@ export default function TableLine<T extends TableList>({ data }: ITable<T>) {
                 th: 'bg-background text-neutral-300'
             }}
         >
-            <TableHeader>
-                <TableColumn key="name" allowsSorting>
-                    Name
-                </TableColumn>
-                <TableColumn key="height" allowsSorting>
-                    Height
-                </TableColumn>
-                <TableColumn key="year">
-                    Birth year
-                </TableColumn>
+            <TableHeader> 
+                { Object.keys(sortedItems[0]).map( k => 
+                    <TableColumn key={k} allowsSorting>
+                        {k}
+                    </TableColumn>
+                ) }
             </TableHeader>
             <TableBody
                 items={sortedItems} 
             >
                 {(item) => (
-                    <TableRow key={item.name}>
+                    <TableRow key={item.process_id}>
                         {(columnKey) => <TableCell>{renderCell(item, columnKey)}</TableCell>}
                     </TableRow>
                 )}

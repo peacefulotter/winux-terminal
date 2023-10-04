@@ -8,9 +8,9 @@ import terminal.colors.Ansi
 
 class Basic(manager: ActorRef) extends LineStreamHandler {
 	
-	override def processLine(line: String, i: Int): Unit = {
+	override def processLine(line: String, i: Int, session: Int): Unit = {
 		val res = Response.Success(DataLine(s"${Ansi.BRIGHT_BLACK}[$i]${Ansi.RESET}\t$line"))
-		manager ! SendResponse(res)
+		manager ! SendResponse(session, res)
 	}
 	
 	override def done(): Response = Response.Nothing()

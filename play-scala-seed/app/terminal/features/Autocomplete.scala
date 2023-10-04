@@ -1,6 +1,5 @@
 package terminal.features
 
-import akka.actor.ActorRef
 import models.Response
 import os.{Path, StatInfo}
 import terminal.cmds.DataAutocompletion
@@ -8,7 +7,7 @@ import terminal.helpers.{InputHelper, PathHelper}
 
 import scala.util.{Failure, Success}
 
-class Autocomplete(manager: ActorRef) {
+class Autocomplete() {
 	// returns ( <partial+optional>childFolder, matched folders and files)
 	private type Child = Option[String]
 	private type Candidates = IndexedSeq[(Path, StatInfo)]

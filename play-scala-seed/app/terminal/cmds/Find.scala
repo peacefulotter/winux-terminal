@@ -9,7 +9,7 @@ import terminal.helpers.PathHelper
 import scala.util.{Failure, Success, Try}
 import scala.annotation.tailrec
 
-class Find(manager: ActorRef, path: Path) extends Command {
+class Find(manager: ActorRef, path: Path, session: Int) extends Command {
 	private case class Solver(file: Option[String], depth: Option[Int])
 	
 	@tailrec
@@ -27,7 +27,7 @@ class Find(manager: ActorRef, path: Path) extends Command {
 	}
 	
 	private def findFile(file: String, depth: Int): Response = {
-		manager ! SendResponse(Response.Success(DataLine(
+		manager ! SendResponse(session, Response.Success(DataLine(
 			s"Searching for '$file' with depth=$depth..."
 		)))
 		
@@ -38,7 +38,7 @@ class Find(manager: ActorRef, path: Path) extends Command {
 		os.walk.stream.attrs(path, skip, maxDepth=depth)
 			.filter { case (p, s) => s.isFile }
 			.foreach { c =>
-				manager ! SendResponse(Response.Success(DataLine(
+				manager ! SendResponse(session, Response.Success(DataLine(
 					PathHelper.getFileName(c, fullPath = true)
 				)))
 			}

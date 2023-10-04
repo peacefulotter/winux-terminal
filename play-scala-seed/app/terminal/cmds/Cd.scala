@@ -9,7 +9,7 @@ import scala.util.{Failure, Success}
 class Cd(path: Path) extends Command {
 	def handle(params: List[String]): Response = {
 		if ( params.isEmpty )
-			return Response.Nothing[String]()
+			return Response.Nothing()
 		
 		PathHelper.getSubPath(path, params.head) match {
 			case Success(path) =>

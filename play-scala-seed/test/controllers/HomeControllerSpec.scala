@@ -45,7 +45,8 @@ class HomeControllerSpec extends PlaySpec {
 			.sortBy { -_._2 }
 		
 		println("TOTAL: " + currentProcesses.map { _._2 }.sum)
-		println( currentProcesses.map( e => s"${e._1.getName}: ${round2(e._2)}%  ${e._1.getProcessID}, ${e._1.getStartTime}, ${e._1.getResidentSetSize}, ${e._1.getVirtualSize}") )
+		val table = currentProcesses.map(e => (e._1.getStartTime, e._1.getProcessID, e._1.getName, e._1.getResidentSetSize, e._1.getVirtualSize, round2(e._2)))
+		println(table)
 	}
 	
 	"GenresController GET" should {

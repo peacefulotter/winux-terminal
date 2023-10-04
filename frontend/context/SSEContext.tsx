@@ -31,8 +31,7 @@ export const SSEProvider = ({ children }: PropsWithChildren) => {
 
     useEffect( () => {
         if (sse === undefined) return;
-        sse.onmessage = (test) => {
-            const { data } = test
+        sse.onmessage = ({ data }) => {
             const res = JSON.parse(data) as AddUIPayload // TODO: make sure casting properly 
             console.log('SSE RES: ', res);
             addContent(res)

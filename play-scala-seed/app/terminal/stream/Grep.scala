@@ -10,10 +10,10 @@ class Grep(manager: ActorRef, params: List[String]) extends Basic(manager) {
 	private val regex: Regex = (if (params.isEmpty) "" else params.head).r
 	// Can process other params if needed
 	
-	override def processLine(line: String, i: Int): Unit = {
+	override def processLine(line: String, i: Int, session: Int): Unit = {
 		val matches = regex.replaceAllIn(line, m => s"${Ansi.RED}${Ansi.BOLD}${m}${Ansi.RESET}" )
 		if (regex.findFirstIn(line).nonEmpty) {
-			super.processLine(matches, i)
+			super.processLine(matches, i, session)
 		}
 	}
 	

@@ -9,7 +9,7 @@ import Line from "./Line"
 import ListLine from "./ListLine"
 import FlexLine from "./FlexLine"
 import FixedCommandLine from "./FixedCommandLine"
-import CTable from "./Table"
+import TableLine from "./TableLine"
 
 interface ITerminal { session: number }
 
@@ -32,6 +32,9 @@ export default function Terminal({ session }: ITerminal) {
             case "flex":
                 node = <FlexLine {...res} />
                 break
+            case 'table':
+                node = <TableLine {...res} />
+                break
         }
         return <React.Fragment key={`node-${i}`}>{node}</React.Fragment>
     }) , [content])
@@ -42,7 +45,6 @@ export default function Terminal({ session }: ITerminal) {
         <div className='pb-[50%] overflow-y-scroll scrollbar-thin'>
             {terminalLines}
             <CommandLine session={session} />
-            <CTable />
         </div>
     )
 }

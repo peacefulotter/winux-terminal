@@ -53,13 +53,17 @@ export default function CommandLine({ session }: ICommandLine) {
             const prevCmd = cmd
             setCmd('')
             contentActions[e.key]({path, cmd: prevCmd, session}).then(res => {
-                if (res === undefined) return    
-                console.log("Content action command line: ", res);
-                setPath({ session, path: res.path })
+                if (res !== undefined) {
+                    console.log("Content action command line: ", res);
+                    setPath({ session, path: res.path })
+                }    
                 setDisabled(false)
             })
         }
     }
+
+    if (disabled)
+        return null
     
     return (
         <BaseCommandLine path={path} className='bg-sky-950 p-2 rounded-lg my-2'>

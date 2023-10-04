@@ -1,6 +1,6 @@
 package terminal
 
-import akka.actor.ActorRef
+import akka.actor.{ActorRef, ActorSystem}
 import models.Response
 import os.Path
 import terminal.cmds._
@@ -8,12 +8,14 @@ import terminal.features.{Autocomplete, History}
 import terminal.helpers.InputHelper.parseInput
 import terminal.stream.{Basic, Grep, LineStreamHandler}
 
-class Terminal(manager: ActorRef) {
+import scala.concurrent.ExecutionContext
+
+class Terminal(manager: ActorRef)(implicit system: ActorSystem, implicit val ec: ExecutionContext) {
 	// features
 	val history = new History
-	val autocomplete = new Autocomplete(manager)
+	val autocomplete = new Autocomplete
 	
-	private def getCommand(text: String, path: Path): (Option[Command], List[String]) = {
+	private def getCommand(text: String, path: Path, session: Int): (Option[Command], List[String]) = {
 		val input = parseInput(text)
 		if (input.isEmpty) {
 			return (Option.empty[Command], Nil)
@@ -21,21 +23,21 @@ class Terminal(manager: ActorRef) {
 		
 		val (keyword, params) = (input.head, input.tail)
 		val cmd: Command = keyword match {
-			case "cat" => new Cat(this, path)
+			case "cat" => new Cat(this, path, session)
 			case "cd" => new Cd(path)
 			case "ls" => new Ls(path)
-			case "find" => new Find(manager, path)
+			case "find" => new Find(manager, path, session)
 			case "history" => new HistoryCmd(history)
 			case "colors" => new Colors()
 			case "system" => new System()
-			case "top" => new Top()
+			case "top" => new Top(manager, session)
 			case _ => new Builtin(keyword, path) // new Err(keyword)
 		}
 		(Some(cmd), params)
 	}
 	
-	def handleCommand(text: String, path: Path): Response = {
-		getCommand(text, path) match {
+	def handleCommand(text: String, path: Path, session: Int): Response = {
+		getCommand(text, path, session) match {
 			case (Some(cmd), params) =>
 				val res = cmd.handle(params)
 				history.push(text)

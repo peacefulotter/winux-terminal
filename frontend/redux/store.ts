@@ -1,9 +1,9 @@
-import { PayloadAction, configureStore, createSlice } from "@reduxjs/toolkit"
+import { Action, AnyAction, Dispatch, Draft, Middleware, PayloadAction, configureStore, createSlice } from "@reduxjs/toolkit"
 import { TerminalState, UIResponse } from "@/types"
 
 export type RootState = { path: string, content: UIResponse[] }[]
 export type PathPayload = { session: number, path: string }
-export type AddUIPayload = UIResponse & { session: number }
+export type UIPayload = UIResponse & { session: number }
 
 const DEFAULT_DIR = "D:\\"
 
@@ -11,10 +11,15 @@ const Slice = createSlice({
     name: 'lines',
     initialState: [{ path: DEFAULT_DIR, content: [] }] as RootState,
     reducers: {
-        add: (state, { payload }: PayloadAction<AddUIPayload>) => {
+        add: (state, { payload }: PayloadAction<UIPayload>) => {
             const { session, ...data } = payload
-            console.log("adding content ", payload);
+            console.log("[store] adding content ", payload);
             state[session].content.push(data)
+        },
+        replace: (state, { payload }: PayloadAction<UIPayload>) => {
+            const { session, ...data } = payload
+            console.log("[store] replacing content", payload);
+            state[session].content.splice(-1, 1, data)
         },
         addFixedCmd: (state, { payload }: PayloadAction<TerminalState>) => {
             const { session, ...data } = payload
@@ -39,17 +44,16 @@ const store = configureStore({ reducer })
 export default store
 // export type RootState = ReturnType<typeof store.getState>
 
-export const addContent = (payload: AddUIPayload) => 
-    store.dispatch(actions.add(payload))
+const exportReducer = <T,U>(
+    action: (payload: T) => ({payload: T, type: U})
+) => {
+    return (t: T) => store.dispatch(action(t))
+}
 
-export const addFixedCmd = (payload: TerminalState) => 
-    store.dispatch(actions.addFixedCmd(payload))
 
-export const setPath = (payload: PathPayload) => 
-    store.dispatch(actions.setPath(payload))
-
-export const addTab = () => 
-    store.dispatch(actions.addTab())
-
-export const removeTab = (session: number) => 
-    store.dispatch(actions.removeTab(session))
+export const addContent = exportReducer(actions.add)
+export const replaceContent = exportReducer(actions.replace)
+export const addFixedCmd = exportReducer(actions.addFixedCmd)
+export const setPath = exportReducer(actions.setPath)
+export const addTab = exportReducer(actions.addTab)
+export const removeTab = exportReducer(actions.removeTab)

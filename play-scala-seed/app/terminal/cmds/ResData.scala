@@ -34,7 +34,7 @@ object ResData {
 	private case class JsonConversionException(private val message: String = "", private val cause: Throwable = None.orNull)
 		extends Exception(message, cause)
 	
-	def toJson[U](elt: U): JsValue = elt match {
+	private def toJson[U](elt: U): JsValue = elt match {
 		case n if n == null => JsNull
 		case js: JsValue => js
 		case b: Boolean => JsBoolean(b)

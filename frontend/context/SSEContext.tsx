@@ -6,9 +6,10 @@ import {
     useState,
 } from "react";
 
-import  { addContent, AddUIPayload } from '@/redux/store' 
-import { Status, UIResponse } from "@/types";
+import  { addContent, UIPayload, replaceContent } from '@/redux/store' 
+import { Status } from "@/types";
 
+type SSEResponse = UIPayload & { replace?: string }
 
 interface ContextProps {
     status: Status 
@@ -18,25 +19,22 @@ const SSEContext = createContext({} as ContextProps);
 
 export const SSEProvider = ({ children }: PropsWithChildren) => {
 
-    const [sse, setSSE] = useState<EventSource>()
 	const [status, setStatus] = useState<Status>(Status.Nothing)
 
 	useEffect( () => {
 		const es = new EventSource('http://localhost:9000/terminal/sse')
 		es.onopen = () => setStatus(Status.Success)
 		es.onerror = () => setStatus(Status.Error)
-		setSSE(es)
+		es.onmessage = ({ data }) => {
+            const res = JSON.parse(data) as SSEResponse // TODO: make sure casting properly 
+            console.log('SSE RES: ', res);
+			if (res.replace)
+				replaceContent(res)
+			else
+	            addContent(res)
+        }
 		return () => setStatus(Status.Nothing)
 	}, [])
-
-    useEffect( () => {
-        if (sse === undefined) return;
-        sse.onmessage = ({ data }) => {
-            const res = JSON.parse(data) as AddUIPayload // TODO: make sure casting properly 
-            console.log('SSE RES: ', res);
-            addContent(res)
-        }
-    }, [sse])
     
     return (
 		<SSEContext.Provider

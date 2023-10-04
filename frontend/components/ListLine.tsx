@@ -8,8 +8,8 @@ interface IListLine {
 export default function ListLine( { data }: IListLine ) {
     return (
       	<div className=''>
-			{ data.map( text => 
-                <Line text={text} />
+			{ data.map( (text, i) => 
+                <Line key={`line-${i}`} text={text} />
             ) }
       	</div>
     )

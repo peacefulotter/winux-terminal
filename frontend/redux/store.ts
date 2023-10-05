@@ -1,4 +1,4 @@
-import { Action, AnyAction, Dispatch, Draft, Middleware, PayloadAction, configureStore, createSlice } from "@reduxjs/toolkit"
+import { ActionCreatorWithPayload, ActionCreatorWithoutPayload, PayloadAction, configureStore, createSlice } from "@reduxjs/toolkit"
 import { TerminalState, UIResponse } from "@/types"
 
 export type RootState = { path: string, content: UIResponse[] }[]
@@ -44,16 +44,36 @@ const store = configureStore({ reducer })
 export default store
 // export type RootState = ReturnType<typeof store.getState>
 
-const exportReducer = <T,U>(
-    action: (payload: T) => ({payload: T, type: U})
-) => {
-    return (t: T) => store.dispatch(action(t))
+// type ActionCreator<T, U extends string = string> = T extends undefined 
+//     ? ActionCreatorWithoutPayload<U> 
+//     : ActionCreatorWithPayload<T, U>  
+
+// function actionWithoutPayload<U extends string = string>(
+//     action: ActionCreator<any, U>
+// ): action is ActionCreatorWithoutPayload<U>  
+// {
+//     return action.length === 0;
+// }
+
+// function actionWithPayload<T, U extends string>(
+//     action: ActionCreator<any, U>
+// ): action is ActionCreatorWithPayload<T, U>  
+// {
+//     return action.length === 1;
+// }
+
+// TODO: find way to group these two functions together
+const exportReducerWithPayload = <T, U extends string = string>(action: ActionCreatorWithPayload<T, U>) => {
+    return (t: T) => store.dispatch(action(t));
+} 
+
+const exportReducer = <U extends string = string,>(action: ActionCreatorWithoutPayload<U>) => {
+    return () => store.dispatch(action())
 }
 
-
-export const addContent = exportReducer(actions.add)
-export const replaceContent = exportReducer(actions.replace)
-export const addFixedCmd = exportReducer(actions.addFixedCmd)
-export const setPath = exportReducer(actions.setPath)
+export const addContent = exportReducerWithPayload(actions.add)
+export const replaceContent = exportReducerWithPayload(actions.replace)
+export const addFixedCmd = exportReducerWithPayload(actions.addFixedCmd)
+export const setPath = exportReducerWithPayload(actions.setPath)
 export const addTab = exportReducer(actions.addTab)
-export const removeTab = exportReducer(actions.removeTab)
+export const removeTab = exportReducerWithPayload(actions.removeTab)

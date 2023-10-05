@@ -19,6 +19,7 @@ import os.Path
 
 import javax.inject._
 import scala.concurrent.ExecutionContext
+import scala.util.Try
 
 /**
  * This controller creates an `Action` to handle HTTP requests to the
@@ -33,35 +34,35 @@ class TerminalController @Inject()(
 	private[this] val manager = system.actorOf(ActorRefManager.props)
 	private[this] val terminal = new Terminal(manager)(system, ec)
 	
-	private def getBody(f: (String, Path, Int, JsValue) => Response)(implicit request: Request[AnyContent]): Result =
-		request.body.asJson match {
-			case Some(body) =>
-				val (cmd, path, session) = (body("cmd").as[String], body("path").as[String], body("session").as[Int])
-				println(s"CMD: $cmd, PATH: $path, SESSION: $session")
-				val json = f(cmd, Path(path), session, body).json
-				println(s"final json $json")
-				Ok(json)
-			case None =>
-				Ok("No json body passed")
+	private def getBody(f: (String, Path, Int, JsValue) => Response): Action[AnyContent] = Action { request =>
+		try {
+			request.body.asJson match {
+				case Some(body) =>
+					val (cmd, path, session) = (body("cmd").as[String], body("path").as[String], body("session").as[Int])
+					println(s"CMD: $cmd, PATH: $path, SESSION: $session")
+					val json = f(cmd, Path(path), session, body).json
+					println(s"final json $json")
+					Ok(json)
+			}
 		}
-	
-	def cmd: Action[AnyContent] = Action { implicit request =>
-		getBody { (cmd, path, session, _) => terminal.handleCommand(cmd, path, session) }
-	}
-	
-	def autocomplete: Action[AnyContent] = Action { implicit request =>
-		getBody { (cmd, path, _, _) =>
-			terminal.autocomplete.handle(cmd, path)
+		catch {
+			case e: Exception => Ok(Response.Failure(e.getMessage).json)
 		}
 	}
 	
-	def history: Action[AnyContent] = Action { implicit request =>
-		getBody { (_, _, _, json) => json("dir") match {
-			case JsString("up") => terminal.history.arrowUp()
-			case JsString("down") => terminal.history.arrowDown()
-			case _ => Response.Failure("dir param must either be 'up' or 'down'")
-		} }
+	def cmd: Action[AnyContent] = getBody { (cmd, path, session, _) =>
+		terminal.handleCommand(cmd, path, session)
 	}
+	
+	def autocomplete: Action[AnyContent] = getBody { (cmd, path, _, _) =>
+		terminal.autocomplete.handle(cmd, path)
+	}
+	
+	def history: Action[AnyContent] = getBody { (_, _, _, json) => json("dir") match {
+		case JsString("up") => terminal.history.arrowUp()
+		case JsString("down") => terminal.history.arrowDown()
+		case _ => Response.Failure("dir param must either be 'up' or 'down'")
+	} }
 	
 	def sse: Action[AnyContent] = Action {
 		val bufferSize = 128
@@ -74,7 +75,7 @@ class TerminalController @Inject()(
 			OverflowStrategy.dropHead
 		).watchTermination() { case (actorRef, terminate) =>
 			manager ! Register(actorRef)
-			terminate.onComplete(_ => manager ! UnRegister(actorRef))
+			// terminate.onComplete(_ => manager ! UnRegister(actorRef))
 			actorRef
 		}
 		Ok.chunked(source via EventSource.flow).as(ContentTypes.EVENT_STREAM)

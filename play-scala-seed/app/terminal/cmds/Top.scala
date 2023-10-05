@@ -4,14 +4,15 @@ import akka.actor.{ActorRef, ActorSystem, Cancellable}
 import models.Response
 import com.sun.management.OperatingSystemMXBean
 import managers.ActorRefManager.SendResponse
+import org.joda.time.format.FormatUtils
 import oshi.SystemInfo
 import oshi.software.os.OperatingSystem
-
-import java.lang.management.ManagementFactory
 import oshi.util.FormatUtil
 
+import java.lang.management.ManagementFactory
 import java.text.SimpleDateFormat
 import scala.concurrent.ExecutionContext
+import scala.concurrent.duration.DurationInt
 import scala.jdk.CollectionConverters._
 
 class Top(manager: ActorRef, session: Int)(implicit system: ActorSystem, implicit val ec: ExecutionContext) extends Command {
@@ -24,7 +25,8 @@ class Top(manager: ActorRef, session: Int)(implicit system: ActorSystem, implici
 	private def getProcesses(implicit os: OperatingSystem) =
 		os.getProcesses(OperatingSystem.ProcessFiltering.VALID_PROCESS, OperatingSystem.ProcessSorting.CPU_DESC, 20).asScala
 	
-	private def retrieveData(): Unit = {
+
+	private def retrieveData(): Response = {
 		val si = new SystemInfo
 		implicit val os: OperatingSystem = si.getOperatingSystem
 		
@@ -50,29 +52,30 @@ class Top(manager: ActorRef, session: Int)(implicit system: ActorSystem, implici
 			})
 			.sortBy { -_._2 }
 		
-		
-		// TODO: keys, Map(keys -> List[String], unique -> OneOf[keys])
-		// TODO: values must be Map(value -> ?, formatted: String)
 		println(s"CPU Load:  process ${bean.getProcessCpuLoad}%, system ${bean.getSystemCpuLoad}%")
 		println("TOTAL: " + currentProcesses.map { _._2 }.sum)
-		val table: Seq[Map[String, String]] = currentProcesses.map(e => Map(
-			"start_time" -> formatter.format(e._1.getStartTime),
-			"process_id" -> e._1.getProcessID.toString,
+		val table = currentProcesses.map(e => Map(
+			"start_time" -> (e._1.getStartTime, formatter.format(e._1.getStartTime)),
+			"process_id" -> (e._1.getProcessID, e._1.getProcessID.toString),
 			"name" -> e._1.getName,
-			"RSS" -> FormatUtil.formatBytes(e._1.getResidentSetSize),
-			"VS" -> FormatUtil.formatBytes(e._1.getVirtualSize),
-			"CPU" -> round2(e._2).toString
+			"RSS" -> (e._1.getResidentSetSize, FormatUtil.formatBytes(e._1.getResidentSetSize)),
+			"VS" -> (e._1.getVirtualSize, FormatUtil.formatBytes(e._1.getVirtualSize)),
+			"CPU" -> (round2(e._2), round2(e._2).toString)
 		)).toSeq
-		println(table)
-		manager ! SendResponse(session, Response.Success(DataTable(table)))
+		Response.Success(DataTable(Map(
+			"table" -> table,
+			"keys" -> table.head.keySet.toSeq
+		)), replace = true)
 	}
 	
 	def handle(params: List[String]): Response = {
+		val instance: Cancellable = system.scheduler.scheduleAtFixedRate(256.millisecond, 256.milliseconds)(() => {
+			val res = retrieveData()
+			manager ! SendResponse(session, res)
+		})
+		system.scheduler.scheduleOnce(5.seconds, new Runnable {
+			override def run(): Unit = instance.cancel()
+		})
 		retrieveData()
-//		val instance: Cancellable = system.scheduler.scheduleAtFixedRate(0.millisecond, 256.milliseconds)(() => retrieveData())
-//		system.scheduler.scheduleOnce(5.seconds, new Runnable {
-//			override def run(): Unit = instance.cancel()
-//		})
-		Response.Nothing()
 	}
 }

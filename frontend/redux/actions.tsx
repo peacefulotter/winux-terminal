@@ -21,6 +21,7 @@ const prefillFetch = <T extends FetchResponse, U>(
     {...state, ...body},
     (res: T) => {
         if (res.name === 'error') {
+            console.log('[actions - res: error]', res);
             addContent({ name: 'line', data: res.data, session: state.session })
             return undefined
         }    
@@ -32,7 +33,7 @@ const prefillFetch = <T extends FetchResponse, U>(
 export const processCommand = prefillFetch(
     '/cmd',
     (res: ContentResponse | PathResponse, state) => {
-        console.log(res)
+        console.log('[processCommand]', res, state)
         if ( res.name !== 'path' && res.status !== Status.Nothing )
             addContent({...res, session: state.session})
         return { path: res.name === 'path' ? res.data : state.path }

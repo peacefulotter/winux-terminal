@@ -20,7 +20,7 @@ final case class DataAutocompletion(autocompletion: String, propositions: Indexe
 final case class DataFlex[T](data: Seq[T])
 	extends ResData("flex", data)
 
-final case class DataTable[T <: Map[String, String]](data: Seq[T])
+final case class DataTable[U](data: Map[String, U])
 	extends ResData("table", data)
 	
 final case class DataPath(data: String)
@@ -32,13 +32,16 @@ final case class DataHistory(data: String)
 
 object ResData {
 	private case class JsonConversionException(private val message: String = "", private val cause: Throwable = None.orNull)
-		extends Exception(message, cause)
+		extends Exception(s"Exception when building a Json Response: $message", cause)
 	
 	private def toJson[U](elt: U): JsValue = elt match {
 		case n if n == null => JsNull
 		case js: JsValue => js
 		case b: Boolean => JsBoolean(b)
-		case n: Int => JsNumber(n)
+		case i: Int => JsNumber(i)
+		case l: Long => JsNumber(l)
+		case d: Double => JsNumber(d)
+		case bd: BigDecimal => JsNumber(bd)
 		case s: String => JsString (s)
 		case Tuple2(v1, v2) => JsArray(Seq(toJson(v1), toJson(v2)))
 		case Tuple3(v1, v2, v3) => JsArray(Seq(toJson(v1), toJson(v2), toJson(v3)))

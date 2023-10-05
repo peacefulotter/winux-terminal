@@ -2,10 +2,13 @@ import { SortDescriptor, Table, TableBody, TableCell, TableColumn, TableHeader, 
 import { Key, useCallback, useMemo, useState } from "react";
 import Line from "./Line";
 
-type TableList = Record<string, string>
+type TableList = Record<string, any>
 
-interface ITable<T> {
-    data: T[]
+interface ITable<T extends TableList> {
+    data: {
+        keys: string[]
+        table: T[]
+    }
 }
 
 const getDescriptor = <T extends TableList,>(list: T[]): SortDescriptor => ({ 
@@ -15,16 +18,23 @@ const getDescriptor = <T extends TableList,>(list: T[]): SortDescriptor => ({
 
 export default function TableLine<T extends TableList>({ data }: ITable<T>) {
 
-    const [descriptor, setDescriptor] = useState<SortDescriptor>(getDescriptor(data))
+    const { keys, table } = data
+    const [descriptor, setDescriptor] = useState<SortDescriptor>(getDescriptor(table))
 
     const renderCell = useCallback( (t: T, columnKey: Key) => {
-        return <Line text={t[columnKey as keyof T]} />
+        const val = t[columnKey as keyof T]
+        const text = Array.isArray(val) ? val[1] : val
+        return <Line text={text} />
     }, []);
     
-    const sortedItems = useMemo(() => [...data].sort((a, b) => {
+    const sortedItems = useMemo(() => [...table].sort((a, b) => {
         const first = a[descriptor.column as keyof T];
         const second = b[descriptor.column as keyof T];
-        const cmp = (parseInt(first) || first) < (parseInt(second) || second) ? -1 : 1;
+        let cmp = 0
+        if (Array.isArray(first) && Array.isArray(second))
+            cmp = first[0] < second[0] ? -1 : 1
+        else
+            cmp = first < second ? -1 : 1
         return descriptor.direction === "descending" ? -cmp : cmp
     }), [descriptor, data]);
 
@@ -41,7 +51,7 @@ export default function TableLine<T extends TableList>({ data }: ITable<T>) {
             }}
         >
             <TableHeader> 
-                { Object.keys(sortedItems[0]).map( k => 
+                { keys.map( k => 
                     <TableColumn key={k} allowsSorting>
                         {k}
                     </TableColumn>

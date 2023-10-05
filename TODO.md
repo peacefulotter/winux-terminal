@@ -9,6 +9,7 @@
 ## Features
 - Add support for `explorer 'path'`
 - Add support for `nano`, a built-in editor
+- Add a help command
 
 ## Miscs
 - export from browser to app (using electron?)

@@ -43,7 +43,7 @@ class Find(manager: ActorRef, path: Path, session: Int) extends Command {
 				)))
 			}
 			
-		Response.Success(DataLine("done."))
+		Response.Nothing()
 	}
 	
 	def handle(params: List[String]): Response = {

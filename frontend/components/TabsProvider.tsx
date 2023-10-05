@@ -44,12 +44,12 @@ export default function TabsProvider({ children }: ITabsProvider) {
                 selectedKey={selected}
                 onSelectionChange={onSelectionChange} 
                 classNames={{
-                    base: 'shadow-lg shadow-background z-40',
+                    base: 'shadow-lg shadow-background z-40 max-w-full',
                     panel: 'h-full overflow-y-scroll shadow-terminal',
-                    tab: 'bg-background-dark data-[selected=true]:bg-background-dark/60 data-[selected=true]:border border-sky-950 last:w-12',
-                    cursor: 'bg-transparent rounded-lg',
-                    tabList: 'w-full rounded-none',
-                    tabContent: "w-fit group-data-[selected=true]:text-path last:text-neutral-300",
+                    tab: 'bg-background-dark border-sky-950 last:w-12 py-5 group',
+                    cursor: 'bg-transparent rounded-lg group-aria-selected:bg-sky-950/50 group-aria-selected:border border-neutral-300/20',
+                    tabList: 'w-full max-w-full rounded-none overflow-x-hidden',
+                    tabContent: "w-fit group-data-[selected=true]:font-bold last:text-neutral-300 overflow-hidden text-ellipsis",
                 }}
             >
                 {({ session, label }) => (

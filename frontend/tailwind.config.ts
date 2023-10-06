@@ -26,6 +26,9 @@ const config: Config = {
       colors: { ...colors },
       boxShadow: {
         'terminal': `inset 0 -35px 60px -15px ${colors.background}`,
+      },
+      backgroundImage: {
+        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
       }
     }
   },

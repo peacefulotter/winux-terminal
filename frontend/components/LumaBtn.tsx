@@ -1,5 +1,5 @@
 
-import { gothic } from '@/fonts';
+import { raleway } from '@/fonts';
 import { MouseEventHandler, PropsWithChildren, useRef, useState } from 'react';
 import { IconType } from 'react-icons';
 
@@ -56,10 +56,11 @@ const themes = {
 
 interface ILumaBtn {
     theme: keyof typeof themes
-    icon: IconType
+    icon: IconType,
+    fill?: boolean
 }
 
-export default function LumaBtn( { theme, icon: Icon, children }: PropsWithChildren<ILumaBtn> ) {
+export default function LumaBtn( { theme, fill, icon: Icon, children }: PropsWithChildren<ILumaBtn> ) {
 
     const parentRef = useRef<HTMLButtonElement>(null)
     const gradientRef = useRef<HTMLDivElement>(null)
@@ -74,27 +75,27 @@ export default function LumaBtn( { theme, icon: Icon, children }: PropsWithChild
         console.log(x, y);
     }
 
-    const { from, via, active, bg, text, fill } = themes[theme]
+    const { from, via, active, bg, text, fill: fillClass } = themes[theme]
 
     return (
         <button className='relative overflow-hidden h-min font-sans group' ref={parentRef} style={{borderRadius: 'calc(0.75rem + 1px)'}}>
             <div className='absolute -inset-3 saturate-150 transition-opacity'>
-                <div className={`absolute -inset-48 top-0 left-0 bg-gradient-radial ${from} ${via} to-blue-500/0 ${active} transition-[colors,opacity] ease-in-out opacity-0 group-hover:opacity-100`}
+                <div className={`absolute -inset-48 top-0 left-0 bg-gradient-radial ${from} ${via} to-blue-500/0 ${active} transition-[background,opacity] ease-in-out opacity-0 group-hover:opacity-100`}
                     style={{transform: `translate(${Math.round(pos.x)}px, ${Math.round(pos.y)}px)`}}
                     ref={gradientRef}
                 >
                 </div>
             </div>
             <div className='absolute inset-[1px] bg-background-dark/80 backdrop-blur-lg rounded-xl'></div>
-            <div className='relative flex flex-1 inset-0 justify-start items-center gap-4 rounded-lg px-3 py-2 z-50' 
+            <div className='relative flex flex-1 inset-0 justify-start items-center gap-3 rounded-lg px-3 py-2 z-50' 
                 onMouseMove={onMouseOver}
             >
                 <div className={`${bg} ${text} p-2 rounded-lg text-xl brightness-110`}>
-                    <Icon size={20} style={{ strokeWidth: 2 }} className={fill} />
+                    <Icon size={20} style={{ strokeWidth: 2 }} className={fill ? fillClass : ''} />
                 </div>
-                <div className={`w-48 text-left text-neutral-100 ${gothic.className}`}>
-                    {children}
-                </div>
+                { children && <div className={`text-left text-neutral-100 ${raleway.className} pr-4`}>
+                    { children }
+                </div> }
             </div>
         </button>
     )

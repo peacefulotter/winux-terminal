@@ -1,7 +1,7 @@
 'use client'
 import { Provider } from 'react-redux';
 import { NextUIProvider } from "@nextui-org/react";
-import { FiBookmark, FiAirplay, FiCodepen, FiThumbsUp, FiTrendingUp, FiCodesandbox } from 'react-icons/fi'
+import { FiBookmark, FiAirplay, FiCodepen, FiThumbsUp, FiTrendingUp, FiCodesandbox, FiBold, FiItalic, FiCode, FiUnderline, FiLink, FiList } from 'react-icons/fi'
 
 import ConnectionStatus from "@/components/ConnectionStatus"
 import Welcome from "@/components/Welcome"
@@ -29,6 +29,12 @@ export default function Home() {
             <LumaBtn theme='cyan' icon={FiThumbsUp}>Its crazy</LumaBtn>
             <LumaBtn theme='green' icon={FiTrendingUp}>Trending</LumaBtn>
             <LumaBtn theme='purple' icon={FiCodesandbox}>Codesandbox</LumaBtn>
+            <LumaBtn theme='blue' icon={FiBold}></LumaBtn>
+            <LumaBtn theme='red' icon={FiItalic}></LumaBtn>
+            <LumaBtn theme='yellow' icon={FiUnderline}></LumaBtn>
+            <LumaBtn theme='cyan' icon={FiCode}></LumaBtn>
+            <LumaBtn theme='green' icon={FiLink}></LumaBtn>
+            <LumaBtn theme='purple' icon={FiList}></LumaBtn>
           </div>
         </div>
         <div className='relative w-full h-[80vh] rounded-2xl flex flex-col border-2 border-sky-950 bg-background overflow-hidden'>

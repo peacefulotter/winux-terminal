@@ -4,6 +4,14 @@ import { MouseEventHandler, PropsWithChildren, useRef, useState } from 'react';
 import { IconType } from 'react-icons';
 
 const themes = {
+    pink: {
+        from: 'from-pink-500/90',
+        via: 'via-pink-500/0',
+        active: 'group-active:bg-pink-500/50',
+        bg: 'bg-pink-600/30' ,
+        text: 'text-pink-600',
+        fill: 'fill-pink-600'
+    },
     blue: {
         from: 'from-blue-500/90',
         via: 'via-blue-500/0',
@@ -35,6 +43,14 @@ const themes = {
         bg: 'bg-yellow-600/20' ,
         text: 'text-yellow-600/80',
         fill: 'fill-yellow-600/80'
+    },
+    orange: {
+        from: 'from-orange-500/90',
+        via: 'via-orange-500/0',
+        active: 'group-active:bg-orange-500/50',
+        bg: 'bg-orange-600/20' ,
+        text: 'text-orange-600/80',
+        fill: 'fill-orange-600/80'
     },
     green: {
         from: 'from-green-500/90',

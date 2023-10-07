@@ -102,7 +102,7 @@ export default function LumaBtn( { theme, fill, icon: Icon, children }: PropsWit
                 >
                 </div>
             </div>
-            <div className='absolute inset-[1px] bg-background-dark/80 backdrop-blur-lg rounded-xl'></div>
+            <div className='absolute inset-[1px] bg-background-950/80 backdrop-blur-lg rounded-xl'></div>
             <div className='relative flex flex-1 inset-0 justify-start items-center gap-3 rounded-lg px-3 py-2 z-50' 
                 onMouseMove={onMouseOver}
             >

@@ -7,6 +7,25 @@ body {
   background: black;
 }
 
+@layer utilities {
+  *::-webkit-scrollbar {
+    width: 10px;
+    height: 20px;
+    @apply cursor-pointer
+  }
+
+  *::-webkit-scrollbar-track {
+    @apply bg-transparent
+  }
+
+  *::-webkit-scrollbar-thumb {
+    @apply bg-neutral-700 shadow-md rounded-full cursor-pointer
+  }
+
+  *::-webkit-scrollbar-thumb:hover {
+    @apply bg-neutral-600
+  }
+}
 
 .ansi-black-fg { @apply text-black }
 .ansi-red-fg { @apply text-red-600 }

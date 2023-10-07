@@ -1,4 +1,4 @@
-import  { addContent } from '@/redux/store' 
+import  { addContent, setAutocompleteContent } from '@/redux/store' 
 
 import terminalFetch from "@/utils/fetch";
 import { 
@@ -50,7 +50,7 @@ const getAutocompletion = prefillFetch(
     '/autocomplete',
     ({status, data}: AutocompletionResponse, state) => {
         if (status === Status.Success && data.propositions !== null)
-            addContent({ name: 'flex', data: data.propositions, session: state.session })
+            setAutocompleteContent({ data: data.propositions, session: state.session })
         const cmd = status === Status.Nothing ? state.cmd : data.autocompletion
         return { status, cmd }
     }

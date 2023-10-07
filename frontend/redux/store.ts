@@ -1,9 +1,16 @@
 import { ActionCreatorWithPayload, ActionCreatorWithoutPayload, PayloadAction, configureStore, createSlice } from "@reduxjs/toolkit"
 import { TerminalState, UIResponse } from "@/types"
+import FlexLine from "@/components/FlexLine"
 
-export type RootState = { path: string, content: UIResponse[] }[]
+type Autocomplete = React.ComponentProps<typeof FlexLine>['data'] | undefined
+export type RootState = { 
+    path: string, 
+    content: UIResponse[], 
+    autocomplete?: Autocomplete
+}[]
 export type PathPayload = { session: number, path: string }
 export type UIPayload = UIResponse & { session: number }
+export type AutocompletePayload =  { data: Autocomplete, session: number }
 
 const DEFAULT_DIR = "D:\\"
 
@@ -20,6 +27,10 @@ const Slice = createSlice({
             const { session, ...data } = payload
             console.log("[store] replacing content", payload);
             state[session].content.splice(-1, 1, data)
+        },
+        autocomplete: (state, { payload }: PayloadAction<AutocompletePayload>) => {
+            const { session, data } = payload
+            state[session].autocomplete = data
         },
         addFixedCmd: (state, { payload }: PayloadAction<TerminalState>) => {
             const { session, ...data } = payload
@@ -73,6 +84,7 @@ const exportReducer = <U extends string = string,>(action: ActionCreatorWithoutP
 
 export const addContent = exportReducerWithPayload(actions.add)
 export const replaceContent = exportReducerWithPayload(actions.replace)
+export const setAutocompleteContent = exportReducerWithPayload(actions.autocomplete)
 export const addFixedCmd = exportReducerWithPayload(actions.addFixedCmd)
 export const setPath = exportReducerWithPayload(actions.setPath)
 export const addTab = exportReducer(actions.addTab)

@@ -15,7 +15,10 @@ interface ITerminal { session: number }
 
 export default function Terminal({ session }: ITerminal) {
     
-    const content = useSelector((state: RootState) => state[session].content)
+    const {content, autocomplete} = useSelector((state: RootState) => ({
+        content: state[session].content,
+        autocomplete: state[session].autocomplete,
+    }))
 
     const terminalLines = useMemo( () => content.map( (res, i) => {
         let node: ReactNode;
@@ -38,13 +41,14 @@ export default function Terminal({ session }: ITerminal) {
         }
         return <React.Fragment key={`node-${i}`}>{node}</React.Fragment>
     }) , [content])
-      
-
     
     return (
-        <div className='overflow-y-scroll scrollbar-thin min-h-full'>
-            {terminalLines}
-            <CommandLine session={session} />
+        <div className='flex flex-col-reverse overflow-y-auto min-h-full'>
+            <div className='flex flex-col overflow-y-auto scrollbar-thin min-h-full'>
+                {terminalLines}
+                <CommandLine session={session} />
+                {autocomplete && <FlexLine data={autocomplete} />}
+            </div>
         </div>
     )
 }

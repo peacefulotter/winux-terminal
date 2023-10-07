@@ -11,7 +11,7 @@ interface ITabsProvider {
     children: (session: Session) => ReactNode
 }
 
-const addTabItem = { session: -1, label: '+' }
+const addTabItem: Item = { session: -1, label: '+' }
 
 const tabsSelector = createSelector(
     (state: RootState) => state, 
@@ -23,7 +23,7 @@ export default function TabsProvider({ children }: ITabsProvider) {
     const [selected, setSelected] = useState<string>("0");
 
     const state = useSelector((state: RootState) => state);
-    const tabs = tabsSelector(state)
+    const tabs: Item[] = tabsSelector(state)
 
     const onSelectionChange = (key: Key) => {
         if (key == addTabItem.session) {
@@ -36,7 +36,7 @@ export default function TabsProvider({ children }: ITabsProvider) {
     }
 
     return (
-        <div className="p-2 flex w-full flex-col text-white max-h-full after:absolute after:bottom-0 after:w-full after:h-6 after:bg-gradient-to-t after:from-background after:to-transparent after:shadow-xl after:z-50">
+        <div className="p-2 flex w-full flex-col text-foreground max-h-full after:absolute after:bottom-1 after:w-full after:h-6 after:bg-gradient-to-t after:from-background-950 after:via-background-950/60 after:to-transparent after:shadow-xl after:z-50">
             <Tabs 
                 aria-label="Dynamic tabs" 
                 variant='light' 
@@ -44,12 +44,12 @@ export default function TabsProvider({ children }: ITabsProvider) {
                 selectedKey={selected}
                 onSelectionChange={onSelectionChange} 
                 classNames={{
-                    base: 'shadow-lg shadow-background z-40 max-w-full',
+                    base: 'shadow-xl shadow-background-950 z-40 max-w-full',
                     panel: 'h-full overflow-y-scroll shadow-terminal',
-                    tab: 'bg-background-dark border-sky-950 last:w-12 py-5 group',
-                    cursor: 'bg-transparent rounded-lg group-aria-selected:bg-sky-950/50 group-aria-selected:border border-neutral-300/20',
+                    tab: 'bg-background-900 last:w-12 py-5 group',
+                    cursor: 'text-foreground rounded-lg bg-background-800 border border-background-300/20 group-aria-selected:border-accent-700',
                     tabList: 'w-full max-w-full rounded-none overflow-x-hidden',
-                    tabContent: "w-fit group-data-[selected=true]:font-bold last:text-neutral-300 overflow-hidden text-ellipsis",
+                    tabContent: "w-fit group-data-[selected=true]:font-bold group-data-[selected=true]:text-foreground text-foreground overflow-hidden text-ellipsis",
                 }}
             >
                 {({ session, label }) => (

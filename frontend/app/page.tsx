@@ -16,7 +16,7 @@ export default function Home() {
   return (
     <NextUIProvider>
     <SSEProvider>
-      <main className="dark flex h-screen flex-col items-center justify-center px-32 gap-4 font-mono overflow-hidden">
+      <main className="flex h-screen flex-col items-center justify-center px-32 gap-4 font-mono overflow-hidden">
         <div className='flex gap-8'>
           <div className='flex flex-col gap-2'>
             <Welcome />
@@ -40,7 +40,7 @@ export default function Home() {
             <LumaBtn theme='red' icon={FiItalic}></LumaBtn>
           </div>
         </div>
-        <div className='relative w-full h-[80vh] rounded-2xl flex flex-col border-2 border-sky-950 bg-background overflow-hidden'>
+        <div className='relative w-full h-[80vh] rounded-2xl flex flex-col bg-background-950 overflow-hidden'>
           <Provider store={store}>
             <TabsProvider>
               {session => <Terminal session={session}/>}

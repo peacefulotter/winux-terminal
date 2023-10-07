@@ -46,8 +46,8 @@ export default function TableLine<T extends TableList>({ data }: ITable<T>) {
             onSortChange={setDescriptor}
             classNames={{
                 table: 'bg-transparent',
-                wrapper: 'bg-background-dark',
-                th: 'bg-background text-neutral-300'
+                wrapper: 'bg-background-950',
+                th: 'bg-background-900 text-neutral-300'
             }}
         >
             <TableHeader> 

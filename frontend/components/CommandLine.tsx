@@ -4,7 +4,7 @@ import { cmdActions, contentActions } from "@/redux/actions";
 import { Actions, Status } from "@/types";
 import BaseCommandLine from "./BaseCommandLine";
 import { useSelector } from "react-redux";
-import { RootState, addFixedCmd, setPath } from "@/redux/store";
+import { RootState, addFixedCmd, setAutocompleteContent, setPath } from "@/redux/store";
 
 interface ICommandLine {
     session: number;
@@ -52,7 +52,8 @@ export default function CommandLine({ session }: ICommandLine) {
             setDisabled(true)
             const prevCmd = cmd
             setCmd('')
-            contentActions[e.key]({path, cmd: prevCmd, session}).then(res => {
+            setAutocompleteContent({ data: undefined, session })
+            contentActions[e.key]({ path, cmd: prevCmd, session }).then(res => {
                 if (res !== undefined) {
                     console.log("Content action command line: ", res);
                     setPath({ session, path: res.path })
@@ -66,7 +67,7 @@ export default function CommandLine({ session }: ICommandLine) {
         return null
     
     return (
-        <BaseCommandLine path={path} className='bg-sky-950 p-2 border border-transparent rounded-lg my-2 focus-within:border-neutral-100/10 transition-colors'>
+        <BaseCommandLine path={path} className='bg-background-900 p-2 border border-transparent rounded-lg my-2 focus-within:border-neutral-100/10 transition-colors'>
             <input 
                 disabled={disabled}
                 ref={ref}

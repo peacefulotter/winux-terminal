@@ -10,6 +10,7 @@ import ListLine from "./ListLine"
 import FlexLine from "./FlexLine"
 import FixedCommandLine from "./FixedCommandLine"
 import TableLine from "./TableLine"
+import Bat from "./Bat"
 
 interface ITerminal { session: number }
 
@@ -48,6 +49,7 @@ export default function Terminal({ session }: ITerminal) {
                 {terminalLines}
                 <CommandLine session={session} />
                 {autocomplete && <FlexLine data={autocomplete} />}
+                {<Bat />}
             </div>
         </div>
     )

@@ -22,7 +22,9 @@ class Ls(path: Path) extends Command {
 		case Left(dir) =>
 			val content = os.walk.attrs(dir, maxDepth = 1)
 				.sortBy { case (p, attrs) => attrs.isFile }
-				.map { case (p, attrs) => (p.baseName, attrs.isDir) }
+				.map { case (p, attrs) =>
+					println(p, attrs)
+					(PathHelper.getFileName((p, attrs)), attrs.isDir) }
 			Response.Success(DataFlex(content))
 		case Right(msg) => Response.Failure(msg)
 	}

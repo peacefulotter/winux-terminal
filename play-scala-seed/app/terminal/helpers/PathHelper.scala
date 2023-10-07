@@ -9,7 +9,8 @@ object PathHelper {
 			if (fullPath) path.toString
 			else path.baseName + (
 				if (attrs.isDir) "/"
-				else "." + path.ext
+				else if (path.ext.nonEmpty) "." + path.ext
+				else ""
 			)
 	}
 	

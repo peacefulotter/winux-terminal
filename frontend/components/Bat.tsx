@@ -1,8 +1,10 @@
 
-
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { oneDark } from "react-syntax-highlighter/dist/cjs/styles/prism";
 
 export default function Bat() {
 
+    const language = 'typescript'
     const file = 'trap.ts'
     const content = [
         'const array = new Array(4).fill([])',
@@ -33,9 +35,13 @@ export default function Bat() {
                 {file}
             </div>
             <div className='flex flex-col p-2 border-t border-l border-b border-background-600' style={{gridColumn: 2, gridRow: 2}}>
-                { content.map((line, i) =>
-                    <pre key={`line-${i}`}>{line}</pre>
-                )}
+                <SyntaxHighlighter 
+                    customStyle={{background: 'var(--tw-background-900)', padding: '0px', margin: '0px'}} 
+                    language={language} 
+                    style={oneDark}
+                >
+                    {content.join('\n')}
+                </SyntaxHighlighter>
             </div>
         </div>
     )

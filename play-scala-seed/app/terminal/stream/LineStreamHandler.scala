@@ -2,16 +2,18 @@ package terminal.stream
 
 import akka.actor.ActorRef
 import managers.ActorRefManager.SendResponse
-import models.Response
-import terminal.cmds.DataLine
+import models.{DataLine, Response}
 import terminal.colors.Ansi
 
-class Basic(manager: ActorRef) extends LineStreamHandler {
+class LineStreamHandler(manager: ActorRef) {
 	
-	override def processLine(line: String, i: Int, session: Int): Unit = {
-		val res = Response.Success(DataLine(s"${Ansi.BRIGHT_BLACK}[$i]${Ansi.RESET}\t$line"))
+	var includeIndices: Boolean = true
+	
+	def processLine(line: String, i: Int, session: Int): Unit = {
+		val prefix = if (includeIndices) s"${Ansi.BRIGHT_BLACK}[$i]${Ansi.RESET}\t" else ""
+		val res = Response.Success(DataLine(s"$prefix$line"))
 		manager ! SendResponse(session, res)
 	}
 	
-	override def done(): Response = Response.Nothing()
+	def done(): Response = Response.Nothing()
 }

@@ -1,45 +1,26 @@
 'use client'
-import React, { ReactNode, useMemo } from "react"
+import React, { useMemo } from "react"
 import { useSelector } from "react-redux"
 
 import { RootState } from "@/redux/store"
 
 import CommandLine from "./CommandLine"
-import Line from "./Line"
-import ListLine from "./ListLine"
 import FlexLine from "./FlexLine"
-import FixedCommandLine from "./FixedCommandLine"
-import TableLine from "./TableLine"
 import Bat from "./Bat"
+import { ResponsesComponent } from "@/types"
+import Line from "./Line"
 
 interface ITerminal { session: number }
 
 export default function Terminal({ session }: ITerminal) {
     
-    const {content, autocomplete} = useSelector((state: RootState) => ({
-        content: state[session].content,
-        autocomplete: state[session].autocomplete,
-    }))
+    const {content, autocomplete} = useSelector((state: RootState) => state[session])
 
     const terminalLines = useMemo( () => content.map( (res, i) => {
-        let node: ReactNode;
-        switch (res.name) {
-            case 'cmd':
-                node = <FixedCommandLine {...res.data} session={session} />
-                break;
-            case "line":
-                node = <Line text={res.data} />
-                break;
-            case "list":
-                node = <ListLine {...res} /> 
-                break;
-            case "flex":
-                node = <FlexLine {...res} />
-                break
-            case 'table':
-                node = <TableLine {...res} />
-                break
-        }
+        const Node = ResponsesComponent[res.name]
+        const node = Node === undefined 
+            ? <Line text={`unknown res.name for component: ${res.name}, this is likely an issue with the backend`} color="error"></Line>
+            : <Node {...res.data as any} /> // find a workaround for as any?
         return <React.Fragment key={`node-${i}`}>{node}</React.Fragment>
     }) , [content])
     
@@ -49,7 +30,7 @@ export default function Terminal({ session }: ITerminal) {
                 {terminalLines}
                 <CommandLine session={session} />
                 {autocomplete && <FlexLine data={autocomplete} />}
-                {<Bat />}
+                {<Bat lang='typescript' file='test.ts' content={['function foo(a: number) {}']}/>}
             </div>
         </div>
     )

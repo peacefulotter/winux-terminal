@@ -6,10 +6,10 @@ import {
     useState,
 } from "react";
 
-import  { addContent, UIPayload, replaceContent } from '@/redux/store' 
+import  { addContent, ComponentPayload, replaceContent } from '@/redux/store' 
 import { Status } from "@/types";
 
-type SSEResponse = UIPayload & { replace?: string }
+type SSEResponse = ComponentPayload & { replace?: string }
 
 interface ContextProps {
     status: Status 

@@ -1,7 +1,6 @@
 package terminal.features
 
-import models.Response
-import terminal.cmds.DataHistory
+import models.{DataHistory, Response}
 
 import scala.collection.mutable.ListBuffer
 

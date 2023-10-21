@@ -1,7 +1,12 @@
+import { JSXElementConstructor } from "react";
+import { ValueOf } from "next/dist/shared/lib/constants";
+
 import Line from "./components/Line";
 import ListLine from "./components/ListLine";
 import FlexLine from "./components/FlexLine";
 import TableLine from "./components/TableLine";
+import Bat from "./components/Bat";
+import FixedCommandLine from "./components/FixedCommandLine";
 
 // https://dev.to/safareli/pick-omit-and-union-types-in-typescript-4nd9
 type Keys<T> = keyof T;
@@ -25,31 +30,46 @@ type Response<T extends string, U> = {
   name: T
 } & (U extends null | undefined ? { data?: U } : { data: U })
 
-type LineResponse = Response<'line', React.ComponentProps<typeof Line>['text']>
-type ListResponse = Response<'list', React.ComponentProps<typeof ListLine>['data']>
-type FlexResponse = Response<'flex', React.ComponentProps<typeof FlexLine>['data']>
-type TableResponse = Response<'table', React.ComponentProps<typeof TableLine>['data']>
-type ErrorResponse = Response<'error', string>
-type FixedCmdResponse = Response<'cmd', Omit<TerminalState, 'session'>>
+// Type of React Component
+type Component = JSXElementConstructor<any> | keyof JSX.IntrinsicElements
+// Type of a Component Response, that can either take the component props as data or an object
+type ComponentResponse<T extends string, U extends Component | object> = 
+  Response<T, U extends Component ? React.ComponentProps<U> : U>
+
+// Component Responses
+export const ResponsesComponent = {
+  'line': Line,
+  'error': ListLine,
+  'list': ListLine,
+  'flex': FlexLine,
+  'table': TableLine,
+  'bat': Bat,
+  'cmd': FixedCommandLine
+} as const
+
+export type ComponentResponses = ValueOf<{
+  [Name in keyof typeof ResponsesComponent]: ComponentResponse<Name, (typeof ResponsesComponent)[Name]>
+}>;
+
+// Other responses that are handled differently (not as straightforward components)
 export type PathResponse = Response<'path', string>
 export type HistoryResponse = Response<'history', string>
-export type AutocompletionResponse = Response<'autocompletiob', {
+type NothingResponse = Response<'nothing', string>
+type ExtractErrorType<T> = T extends { name: "error" } ? T : never;
+export type ErrorResponse = ExtractErrorType<ComponentResponses>;
+export type AutocompletePropositions = React.ComponentProps<typeof FlexLine>['data'] | null
+export type AutocompletionResponse = Response<'autocompletion', {
   autocompletion: string
-  propositions: React.ComponentProps<typeof FlexLine>['data'] | null,
+  propositions: AutocompletePropositions,
 }>
 
-export type ContentResponse = 
-  | LineResponse
-  | ListResponse 
-  | FlexResponse
-  | TableResponse
-  
-export type FetchResponse = ContentResponse | PathResponse | HistoryResponse | AutocompletionResponse | ErrorResponse
-export type FetchResponseData = FetchResponse['data']
-
-export type UIResponse = DistributiveOmit<
-  (ContentResponse | FixedCmdResponse), 'status'
->
+// Groups all responses that we can get from the backend
+export type FetchResponse = 
+  | ComponentResponses 
+  | PathResponse 
+  | HistoryResponse 
+  | AutocompletionResponse 
+  | NothingResponse
 
 /** Actions **/
 export type CmdAction<T> = (state: TerminalState) => Promise<T>

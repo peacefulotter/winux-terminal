@@ -2,16 +2,17 @@
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneDark } from "react-syntax-highlighter/dist/cjs/styles/prism";
 
-export default function Bat() {
+Object.keys(oneDark).forEach( (k) => {
+    k.startsWith('code[class*="language-"]') && (oneDark[k].background = 'transparent')
+});
 
-    const language = 'typescript'
-    const file = 'trap.ts'
-    const content = [
-        'const array = new Array(4).fill([])',
-        'array[0].push("once")',
-        'console.log(array)'
-    ]
+interface BatProps {
+    lang: string;
+    file: string;
+    content?: string[]
+}
 
+export default function Bat({ lang, file, content }: BatProps) {
     return (
         <div className='grid p-1 mt-2' style={{
             gridTemplateColumns: '100px auto',
@@ -26,7 +27,7 @@ export default function Bat() {
                 className='flex flex-col items-end pb-2 pt-[10px] pr-4 text-background-400 border-t border-b border-background-600' 
                 style={{gridColumn: 1, gridRow: 2}}
             >
-                { content.map((_, i) =>
+                { content?.map((_, i) =>
                     <span key={`line-idx-${i}`}>{i}</span>
                 )}
             </div>
@@ -34,13 +35,13 @@ export default function Bat() {
                 <span className='font-bold'>File:</span>
                 {file}
             </div>
-            <div className='flex flex-col p-2 border-t border-l border-b border-background-600' style={{gridColumn: 2, gridRow: 2}}>
+            <div className='flex flex-col p-2 border-t border-l border-b border-background-600 [&>span]:bg-transparent' style={{gridColumn: 2, gridRow: 2}}>
                 <SyntaxHighlighter 
                     customStyle={{background: 'var(--tw-background-900)', padding: '0px', margin: '0px'}} 
-                    language={language} 
+                    language={lang} 
                     style={oneDark}
                 >
-                    {content.join('\n')}
+                    {content ? content.join('\n') : ''}
                 </SyntaxHighlighter>
             </div>
         </div>

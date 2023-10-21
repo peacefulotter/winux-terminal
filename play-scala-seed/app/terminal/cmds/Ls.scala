@@ -1,12 +1,12 @@
 package terminal.cmds
 
-import models.Response
+import models.{DataFlex, Response}
 import os.{Path, StatInfo}
 import terminal.helpers.PathHelper
 
 import scala.util.{Failure, Success}
 
-class Ls(path: Path) extends Command {
+class Ls(implicit params: Command.Params) extends Command {
 	
 	private def getDirectory(params: List[String]): Either[Path, String] = {
 		if (params.nonEmpty)
@@ -23,9 +23,11 @@ class Ls(path: Path) extends Command {
 			val content = os.walk.attrs(dir, maxDepth = 1)
 				.sortBy { case (p, attrs) => attrs.isFile }
 				.map { case (p, attrs) =>
-					println(p, attrs)
-					(PathHelper.getFileName((p, attrs)), attrs.isDir) }
+					(PathHelper.getFileName((p, attrs)), attrs.isDir)
+				}
 			Response.Success(DataFlex(content))
-		case Right(msg) => Response.Failure(msg)
+		case Right(msg) => new Response.Failure(msg)
 	}
 }
+
+

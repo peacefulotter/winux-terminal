@@ -1,10 +1,9 @@
 package terminal.cmds
 
 import akka.actor.{ActorRef, ActorSystem, Cancellable}
-import models.Response
+import models.{DataTable, Response}
 import com.sun.management.OperatingSystemMXBean
 import managers.ActorRefManager.SendResponse
-import org.joda.time.format.FormatUtils
 import oshi.SystemInfo
 import oshi.software.os.OperatingSystem
 import oshi.util.FormatUtil
@@ -15,7 +14,7 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.duration.DurationInt
 import scala.jdk.CollectionConverters._
 
-class Top(manager: ActorRef, session: Int)(implicit system: ActorSystem, implicit val ec: ExecutionContext) extends Command {
+class Top(implicit params: Command.Params, implicit val system: ActorSystem, implicit val ec: ExecutionContext) extends Command {
 	
 	private val formatter: SimpleDateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss")
 	private val bean = ManagementFactory.getPlatformMXBean(classOf[OperatingSystemMXBean])

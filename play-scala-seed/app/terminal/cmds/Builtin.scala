@@ -1,20 +1,19 @@
 package terminal.cmds
 
 import com.pty4j.{PtyProcess, PtyProcessBuilder}
-import models.Response
-import os.Path
+import models.{DataLine, Response}
 
 import scala.language.postfixOps
 import java.io.IOException
 import scala.io.Source
 
-class Builtin(cmd: String, path: Path) extends Command {
+class Builtin(implicit params: Command.Params) extends Command {
 	
 	def handle(params: List[String]): Response = {
 		try {
 			val env = new java.util.HashMap[String, String](System.getenv())
 			env.put("TERM", "xterm")
-			val command = (List("cd", path.toString(), "&&", cmd) ::: params).toArray
+			val command = (List("cd", path.toString(), "&&", keyword) ::: params).toArray
 			println(command.mkString(", "))
 			val process: PtyProcess = new PtyProcessBuilder()
 				.setCommand(command)
@@ -28,9 +27,9 @@ class Builtin(cmd: String, path: Path) extends Command {
 			Response.Success(DataLine(stdout))
 		}
 		catch {
-			case e: IOException => Response.Failure(e.getMessage)
-			case e: UnsupportedOperationException => Response.Failure(e.getMessage)
-			case e: os.SubprocessException => Response.Failure(e.getMessage)
+			case e: IOException => new Response.Failure(e.getMessage)
+			case e: UnsupportedOperationException => new Response.Failure(e.getMessage)
+			case e: os.SubprocessException => new Response.Failure(e.getMessage)
 		}
 	}
 }

@@ -52,7 +52,7 @@ export default function CommandLine({ session }: ICommandLine) {
             setDisabled(true)
             const prevCmd = cmd
             setCmd('')
-            setAutocompleteContent({ data: undefined, session })
+            setAutocompleteContent({ data: null, session })
             contentActions[e.key]({ path, cmd: prevCmd, session }).then(res => {
                 if (res !== undefined) {
                     console.log("Content action command line: ", res);

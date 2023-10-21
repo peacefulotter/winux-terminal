@@ -46,7 +46,7 @@ class TerminalController @Inject()(
 			}
 		}
 		catch {
-			case e: Exception => Ok(Response.Failure(e.getMessage).json)
+			case e: Exception => Ok(new Response.Failure(e.getMessage).json)
 		}
 	}
 	
@@ -61,7 +61,7 @@ class TerminalController @Inject()(
 	def history: Action[AnyContent] = getBody { (_, _, _, json) => json("dir") match {
 		case JsString("up") => terminal.history.arrowUp()
 		case JsString("down") => terminal.history.arrowDown()
-		case _ => Response.Failure("dir param must either be 'up' or 'down'")
+		case _ => new Response.Failure("dir param must either be 'up' or 'down'")
 	} }
 	
 	def sse: Action[AnyContent] = Action {
@@ -75,7 +75,7 @@ class TerminalController @Inject()(
 			OverflowStrategy.dropHead
 		).watchTermination() { case (actorRef, terminate) =>
 			manager ! Register(actorRef)
-			// terminate.onComplete(_ => manager ! UnRegister(actorRef))
+			terminate.onComplete(_ => manager ! UnRegister(actorRef))
 			actorRef
 		}
 		Ok.chunked(source via EventSource.flow).as(ContentTypes.EVENT_STREAM)

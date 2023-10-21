@@ -88,7 +88,6 @@ export default function LumaBtn( { theme, fill, icon: Icon, children }: PropsWit
         const  x = e.clientX - parentBounds.left - gradientBounds.width / 2;
         const  y = e.clientY - parentBounds.top - gradientBounds.height / 2;
         setPos({x, y})
-        console.log(x, y);
     }
 
     const { from, via, active, bg, text, fill: fillClass } = themes[theme]

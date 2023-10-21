@@ -1,12 +1,12 @@
 package terminal.cmds
 
-import models.Response
+import models.{DataFlex, Response}
 import terminal.colors.Ansi
 
 import scala.Console.RESET
 
-class Colors() extends Command {
-	
+class Colors(implicit params: Command.Params) extends Command {
+	// Get static variables of an object
 	private def deepMembers[A: scala.reflect.runtime.universe.TypeTag](a: A): List[String] = {
 		import scala.reflect.runtime.universe._
 		def members(s: Symbol): List[String] =
@@ -18,7 +18,6 @@ class Colors() extends Command {
 					case _ => List.empty[String]
 				}
 			}.foldLeft(List.empty[String])(_ ::: _)
-		
 		members(typeOf[A].termSymbol)
 	}
 	
@@ -26,5 +25,17 @@ class Colors() extends Command {
 	
 	def handle(params: List[String]): Response = {
 		Response.Success(DataFlex(ANSI_MEMBERS))
+	}
+}
+
+object Colors {
+	object Text extends Enumeration {
+		case class C(name: String) extends super.Val
+		val Foreground: C = C("foreground")
+		val Success: C = C("success")
+		val Error: C = C("error")
+		val Info: C = C("info")
+		val File: C = C("file")
+		val Directory: C = C("directory")
 	}
 }

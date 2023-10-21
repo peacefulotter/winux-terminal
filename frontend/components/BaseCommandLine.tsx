@@ -7,11 +7,11 @@ interface Props {
     className: string
 }
 
-const statusEmojiMap: Record<Status, string> = {
-    [Status.Success]: '✔️',
-    [Status.Error]:   '❌',
-    [Status.Nothing]: '', // ⚠️
-}
+// const statusEmojiMap: Record<Status, string> = {
+//     [Status.Success]: '✔️',
+//     [Status.Error]:   '❌',
+//     [Status.Nothing]: '', // ⚠️
+// }
 
 export default function BaseCommandLine({path, className, children}: PropsWithChildren<Props>) {
     return (
@@ -21,7 +21,7 @@ export default function BaseCommandLine({path, className, children}: PropsWithCh
                 <p className='text-dollar'>$</p>
                 {children}
             </div>
-			<div>{statusEmojiMap[Status.Nothing]}</div>
+			<div>✔️</div>
       	</div>
     )
 }

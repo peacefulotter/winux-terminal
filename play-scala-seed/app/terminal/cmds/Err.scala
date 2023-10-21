@@ -2,8 +2,8 @@ package terminal.cmds
 
 import models.Response
 
-class Err(keyword: String) extends Command {
+class Err(implicit params: Command.Params) extends Command {
 	def handle(params: List[String]): Response = {
-		Response.Failure(f"Error: ${keyword} is not a recognized command")
+		new Response.Failure(f"Error: ${keyword} is not a recognized command")
 	}
 }

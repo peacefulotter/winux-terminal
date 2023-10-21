@@ -5,12 +5,15 @@ import {
     Status,
     Actions,
     PathResponse,
-    ContentResponse,
+    ComponentResponses,
     HistoryResponse,
     AutocompletionResponse,
     TerminalState,
-    FetchResponse, 
+    FetchResponse,
+    ResponsesComponent,
+    ErrorResponse, 
 } from "@/types";
+
 
 const prefillFetch = <T extends FetchResponse, U>(
     endpoint: string, 
@@ -19,10 +22,12 @@ const prefillFetch = <T extends FetchResponse, U>(
 ) => (state: TerminalState) => terminalFetch(
     endpoint, 
     {...state, ...body},
-    (res: T) => {
-        if (res.name === 'error') {
-            console.log('[actions - res: error]', res);
-            addContent({ name: 'line', data: res.data, session: state.session })
+    (res: T | ErrorResponse) => {
+        console.log('[prefillFetch - response]', res);
+        if (res.name === 'nothing')
+            return undefined
+        else if (res.name === 'error') {
+            addContent({ ...res, session: state.session })
             return undefined
         }    
         else
@@ -32,7 +37,7 @@ const prefillFetch = <T extends FetchResponse, U>(
 
 export const processCommand = prefillFetch(
     '/cmd',
-    (res: ContentResponse | PathResponse, state) => {
+    (res: ComponentResponses | PathResponse, state) => {
         console.log('[processCommand]', res, state)
         if ( res.name !== 'path' && res.status !== Status.Nothing )
             addContent({...res, session: state.session})

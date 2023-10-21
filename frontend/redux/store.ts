@@ -1,16 +1,14 @@
 import { ActionCreatorWithPayload, ActionCreatorWithoutPayload, PayloadAction, configureStore, createSlice } from "@reduxjs/toolkit"
-import { TerminalState, UIResponse } from "@/types"
-import FlexLine from "@/components/FlexLine"
+import { AutocompletePropositions, ComponentResponses, Status, TerminalState } from "@/types"
 
-type Autocomplete = React.ComponentProps<typeof FlexLine>['data'] | undefined
 export type RootState = { 
     path: string, 
-    content: UIResponse[], 
-    autocomplete?: Autocomplete
+    content: ComponentResponses[], 
+    autocomplete?: AutocompletePropositions
 }[]
 export type PathPayload = { session: number, path: string }
-export type UIPayload = UIResponse & { session: number }
-export type AutocompletePayload =  { data: Autocomplete, session: number }
+export type ComponentPayload = ComponentResponses & { session: number }
+export type AutocompletePayload =  { data: AutocompletePropositions, session: number }
 
 const DEFAULT_DIR = "D:\\"
 
@@ -18,12 +16,12 @@ const Slice = createSlice({
     name: 'lines',
     initialState: [{ path: DEFAULT_DIR, content: [] }] as RootState,
     reducers: {
-        add: (state, { payload }: PayloadAction<UIPayload>) => {
+        add: (state, { payload }: PayloadAction<ComponentPayload>) => {
             const { session, ...data } = payload
             console.log("[store] adding content ", payload);
             state[session].content.push(data)
         },
-        replace: (state, { payload }: PayloadAction<UIPayload>) => {
+        replace: (state, { payload }: PayloadAction<ComponentPayload>) => {
             const { session, ...data } = payload
             console.log("[store] replacing content", payload);
             state[session].content.splice(-1, 1, data)
@@ -34,7 +32,7 @@ const Slice = createSlice({
         },
         addFixedCmd: (state, { payload }: PayloadAction<TerminalState>) => {
             const { session, ...data } = payload
-            state[session].content.push({ name: 'cmd', data })
+            state[session].content.push({ name: 'cmd', status: Status.Success, data })
         },
         setPath: (state, { payload }: PayloadAction<PathPayload>) => {
             const { session, path } = payload

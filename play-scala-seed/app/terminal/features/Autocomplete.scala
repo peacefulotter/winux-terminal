@@ -1,8 +1,7 @@
 package terminal.features
 
-import models.Response
+import models.{DataAutocompletion, Response}
 import os.{Path, StatInfo}
-import terminal.cmds.DataAutocompletion
 import terminal.helpers.{InputHelper, PathHelper}
 
 import scala.util.{Failure, Success}
@@ -62,7 +61,9 @@ class Autocomplete() {
 		}
 		
 		else if (candidates.length > 1) {
-			val propositions = candidates.map { c => (c._1.baseName, c._2.isDir) }
+			val propositions = candidates
+				.map { c => (PathHelper.getFileName(c), c._2.isDir) }
+				.sortBy { case (name, isDir) => (isDir, name) }
 			val commonPath = propositions.foldLeft(propositions.head._1)((acc, cur) => getCommonPrefix(acc, cur._1))
 			val autocompletion = getTextDropChildFolder + commonPath
 			Response.Success(DataAutocompletion(autocompletion, propositions))
@@ -75,7 +76,7 @@ class Autocomplete() {
 	def handle(cmd: String, path: Path): Response = {
 		getCompletionCandidates(cmd, path) match {
 			case Left((child, candidates)) => autocomplete(cmd, path, child, candidates)
-			case Right(msg) => Response.Failure(msg)
+			case Right(msg) => new Response.Failure(msg)
 			case _ => Response.Nothing();
 		}
 	}

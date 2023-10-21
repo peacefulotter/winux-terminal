@@ -6,7 +6,7 @@ import terminal.colors.Ansi
 
 import scala.util.matching.Regex
 
-class Grep(manager: ActorRef, params: List[String]) extends Basic(manager) {
+class Grep(manager: ActorRef, params: List[String]) extends LineStreamHandler(manager) {
 	private val regex: Regex = (if (params.isEmpty) "" else params.head).r
 	// Can process other params if needed
 	
@@ -16,6 +16,4 @@ class Grep(manager: ActorRef, params: List[String]) extends Basic(manager) {
 			super.processLine(matches, i, session)
 		}
 	}
-	
-	override def done(): Response = super.done()
 }

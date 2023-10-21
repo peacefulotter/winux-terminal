@@ -2,14 +2,14 @@ package terminal.cmds
 
 import akka.actor.ActorRef
 import managers.ActorRefManager.SendResponse
-import models.Response
+import models.{DataLine, Response}
 import os.{Path, StatInfo}
 import terminal.helpers.PathHelper
 
 import scala.util.{Failure, Success, Try}
 import scala.annotation.tailrec
 
-class Find(manager: ActorRef, path: Path, session: Int) extends Command {
+class Find(implicit params: Command.Params) extends Command {
 	private case class Solver(file: Option[String], depth: Option[Int])
 	
 	@tailrec
@@ -28,7 +28,8 @@ class Find(manager: ActorRef, path: Path, session: Int) extends Command {
 	
 	private def findFile(file: String, depth: Int): Response = {
 		manager ! SendResponse(session, Response.Success(DataLine(
-			s"Searching for '$file' with depth=$depth..."
+			s"Searching for '$file' with depth=$depth...",
+			Colors.Text.Info
 		)))
 		
 		def skip: (Path, StatInfo) => Boolean = (p: Path, stats: StatInfo) => {
@@ -51,11 +52,11 @@ class Find(manager: ActorRef, path: Path, session: Int) extends Command {
 			solveParams(params) match {
 				case Solver(Some(file), Some(depth)) => findFile(file, depth)
 				case Solver(Some(file), None) => findFile(file, 1)
-				case Solver(None, _)  => Response.Failure("Need to specify a file or directory to search for")
+				case Solver(None, _)  => new Response.Failure("Need to specify a file or directory to search for")
 			}
 		}
 		catch {
-			case e: Exception => Response.Failure(e.getMessage)
+			case e: Exception => new Response.Failure(e.getMessage)
 		}
 	}
 }

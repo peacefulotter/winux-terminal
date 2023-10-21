@@ -2,12 +2,12 @@ import Ansi from "ansi-to-react";
 
 interface ILine {
     text: string;
-    color?: keyof typeof Color;
+    color?: string;
     fromFlex?: boolean
 }
 
 
-export const Color = {
+export const colorClasses = {
     'foreground': 'text-foreground',
     'success': 'text-success',
     'error': 'text-error',
@@ -17,8 +17,12 @@ export const Color = {
 } as const
 
 export default function Line( { text, color, fromFlex }: ILine ) {
-    const colorClass = color ? Color[color] : Color['foreground']
+    const colorClass = color && color in colorClasses 
+        ? colorClasses[color as keyof typeof colorClasses]
+        : colorClasses['foreground']
+
     const flexClass = fromFlex ? 'max-w-min whitespace-nowrap' : 'w-full'
+    
     return (
         <div className={`${colorClass} ${flexClass}`}>
             <pre><Ansi useClasses>{text}</Ansi></pre>

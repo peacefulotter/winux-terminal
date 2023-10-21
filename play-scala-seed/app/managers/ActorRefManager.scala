@@ -14,15 +14,16 @@ class ActorRefManager extends Actor {
         extends Exception(message, cause)
   
     private def onMessage(actor: Option[ActorRef]): Receive = {
-        case Register(actorRef) => context.become(onMessage(Some(actorRef)))
-        case UnRegister(_) => context.become(onMessage(None))
+        case Register(actorRef) =>
+            context.become(onMessage(Some(actorRef)))
+        case UnRegister(_) =>
+            context.become(onMessage(None))
         case SendResponse(session, res) => actor match {
             case Some(ref) =>
                 val json = res.json + ("session" -> JsNumber(session))
                 println(f"Manager sending res: ${json.toString()}")
                 ref ! json.toString()
             case None =>
-                // TODO: find a way to register the actorRef again
                 throw ActorNotSetException("ActorRef is not set, refresh the page!")
         }
     }

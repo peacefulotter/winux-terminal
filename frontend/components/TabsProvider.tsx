@@ -46,7 +46,7 @@ export default function TabsProvider({ children }: ITabsProvider) {
                 classNames={{
                     base: 'shadow-xl shadow-background-950 z-40 max-w-full',
                     panel: 'h-full overflow-y-scroll shadow-terminal',
-                    tab: 'bg-background-900 last:w-12 py-5 group',
+                    tab: 'bg-background-900 last:w-16 py-5 group',
                     cursor: 'text-foreground rounded-lg bg-background-800 border border-background-300/20 group-aria-selected:border-accent-700',
                     tabList: 'w-full max-w-full rounded-none overflow-x-hidden',
                     tabContent: "w-fit group-data-[selected=true]:font-bold group-data-[selected=true]:text-foreground text-foreground overflow-hidden text-ellipsis",

@@ -1,12 +1,11 @@
 package terminal.cmds
 
-import models.Response
-import os.Path
+import models.{DataPath, Response}
 import terminal.helpers.PathHelper
 
 import scala.util.{Failure, Success}
 
-class Cd(path: Path) extends Command {
+class Cd(implicit params: Command.Params) extends Command {
 	def handle(params: List[String]): Response = {
 		if ( params.isEmpty )
 			return Response.Nothing()
@@ -16,9 +15,10 @@ class Cd(path: Path) extends Command {
 				if (os.isDir(path))
 					Response.Success(DataPath(path.toString()))
 				else
-					Response.Failure(f"$path is not a directory")
+					new Response.Failure(f"$path is not a directory")
 			case Failure(exception) =>
-				Response.Failure(exception.getMessage)
+				new Response.Failure(exception.getMessage)
 		}
 	}
 }
+

@@ -1,13 +1,13 @@
 package terminal.cmds
 
-import models.Response
+import models.{DataList, Response}
 import oshi.SystemInfo
 import oshi.util.FormatUtil
 import terminal.colors.Ansi.{BOLD, BRIGHT_BLUE, BRIGHT_YELLOW, RESET}
 
 import scala.jdk.CollectionConverters._
 
-class System extends Command {
+class System(implicit params: Command.Params) extends Command {
 	def handle(params: List[String]): Response = {
 		val si = new SystemInfo()
 		val os = si.getOperatingSystem
@@ -24,7 +24,7 @@ class System extends Command {
 			s"${BRIGHT_YELLOW}[$i]${RESET} ${disk.getModel}, ${FormatUtil.formatBytes(disk.getSize)}"
 		}
 		
-		Response.Success(DataList(List(
+		Response.Success(DataList.default(List(
 			s"${BRIGHT_BLUE}${BOLD}Manufacturer${RESET}: ${sys.getManufacturer}, Model: ${sys.getModel}, Released: ${sys.getFirmware.getReleaseDate}",
 			s"${BRIGHT_BLUE}${BOLD}Operating System${RESET}: ${os.getManufacturer} ${os.getFamily} ${os.getVersionInfo}",
 			s"${BRIGHT_BLUE}${BOLD}Virtual Mem${RESET}: ${FormatUtil.formatBytes(vm.getVirtualInUse)} / ${FormatUtil.formatBytes(vm.getVirtualMax)}",
@@ -41,3 +41,4 @@ class System extends Command {
 		)))
 	}
 }
+

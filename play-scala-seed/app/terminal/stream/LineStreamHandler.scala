@@ -1,11 +1,17 @@
 package terminal.stream
 
+import akka.actor.ActorRef
+import managers.ActorRefManager.SendResponse
 import models.Response
+import terminal.cmds.DataLine
+import terminal.colors.Ansi
 
-trait LineStreamHandler {
-	def processLine(line: String, i: Int, session: Int): Unit
+class Basic(manager: ActorRef) extends LineStreamHandler {
 	
-	// If the handler accumulates some data as it processes lines
-	// Then it can flush that data as a Response back to the client
-	def done(): Response
+	override def processLine(line: String, i: Int, session: Int): Unit = {
+		val res = Response.Success(DataLine(s"${Ansi.BRIGHT_BLACK}[$i]${Ansi.RESET}\t$line"))
+		manager ! SendResponse(session, res)
+	}
+	
+	override def done(): Response = Response.Nothing()
 }

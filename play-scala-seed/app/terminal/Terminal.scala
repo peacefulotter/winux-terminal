@@ -6,7 +6,6 @@ import os.Path
 import terminal.cmds._
 import terminal.features.{Autocomplete, History}
 import terminal.helpers.InputHelper.parseInput
-import terminal.stream.{Grep, LineStreamHandler}
 
 import scala.concurrent.ExecutionContext
 
@@ -15,14 +14,14 @@ class Terminal(manager: ActorRef)(implicit system: ActorSystem, implicit val ec:
 	val history = new History
 	val autocomplete = new Autocomplete
 
-	private def getCommand(text: String, path: Path, session: Int): (Option[Command], List[String]) = {
+	def handleCommand(text: String, path: Path, session: Int): Response = {
 		val input = parseInput(text)
 		if (input.isEmpty) {
-			return (Option.empty[Command], Nil)
+			return Response.Nothing()
 		}
 		
-		val (keyword, params) = (input.head, input.tail)
-		implicit val cmdParams: Command.Params = Command.Params(this, manager, path, session, keyword)
+		val (keyword, arguments) = (input.head, input.tail)
+		implicit val params: Command.Params = Command.Params(this, manager, path, session, keyword, arguments)
 		lazy val commands = Map(
 			"bat" -> new Bat,
 			"cat" -> new Cat,
@@ -36,26 +35,10 @@ class Terminal(manager: ActorRef)(implicit system: ActorSystem, implicit val ec:
 		)
 		// TODO: help command
 		val cmd = commands.getOrElse(keyword, new Builtin)
-		(Some(cmd), params)
-	}
-	
-	def handleCommand(text: String, path: Path, session: Int): Response = {
-		getCommand(text, path, session) match {
-			case (Some(cmd), params) =>
-				val res = cmd.handle(params)
-				history.push(text)
-				println(s"RES from command $res")
-				res
-			case _ => Response.Nothing()
-		}
-	}
-
-	def getStreamHandler(params: List[String]): LineStreamHandler = params match {
-		case cmd :: xs => cmd match {
-			case "grep" => new Grep(manager, xs)
-			case _ => new LineStreamHandler(manager)
-		}
-		case _ => new LineStreamHandler(manager)
+		val res = cmd.handle()
+		println(s"RES from command $res")
+		history.push(text)
+		res
 	}
 	
 	// TODO: implement

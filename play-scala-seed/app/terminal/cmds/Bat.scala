@@ -14,10 +14,11 @@ class Bat(implicit params: Command.Params) extends Cat {
 		manager ! SendResponse(session, res)
 	}
 	
-	override def handle(params: List[String]): Response = parseParams(params) match {
-		case Params(Some(file), out) =>
-			out.includeIndices = false
+	override def handle(): Response = arguments match {
+		case file :: _ =>
+			// TODO: out.includeIndices = false
 			sendStartStream(file)
+			val out = null // TODO: out in command.params
 			pipeStream(file, out)
 		case _ => new Response.Failure("bat requires a filename")
 	}

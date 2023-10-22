@@ -8,17 +8,16 @@ import scala.util.{Failure, Success}
 
 class Ls(implicit params: Command.Params) extends Command {
 	
-	private def getDirectory(params: List[String]): Either[Path, String] = {
-		if (params.nonEmpty)
-			PathHelper.getSubPath(path, params.head) match {
+	private def getDirectory: Either[Path, String] = arguments match {
+		case dir :: _ =>
+			PathHelper.getSubPath(path, dir) match {
 				case Failure(exception) => Right(exception.getMessage)
 				case Success(dir) => Left(dir)
 			}
-		else
-			Left(path)
+		case _ => Left(path)
 	}
 	
-	def handle(params: List[String]): Response = getDirectory(params) match {
+	def handle(): Response = getDirectory match {
 		case Left(dir) =>
 			val content = os.walk.attrs(dir, maxDepth = 1)
 				.sortBy { case (p, attrs) => attrs.isFile }

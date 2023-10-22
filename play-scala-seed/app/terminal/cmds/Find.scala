@@ -13,14 +13,14 @@ class Find(implicit params: Command.Params) extends Command {
 	private case class Solver(file: Option[String], depth: Option[Int])
 	
 	@tailrec
-	private def solveParams(params: List[String], solver: Solver = Solver(None, None)): Solver = {
-		params match {
-			case param :: xs => param match {
+	private def solveArguments(args: List[String], solver: Solver = Solver(None, None)): Solver = {
+		args match {
+			case arg :: xs => arg match {
 				case s"--depth=$d" => Try(d.toInt) match {
-					case Success(depth) => solveParams(xs, Solver(solver.file, Some(depth)))
+					case Success(depth) => solveArguments(xs, Solver(solver.file, Some(depth)))
 					case Failure(_) => throw new NumberFormatException(s"depth parameter should be int, got $d")
 				}
-				case file => solveParams(xs, Solver(Some(file), solver.depth))
+				case file => solveArguments(xs, Solver(Some(file), solver.depth))
 			}
 			case _ => solver
 		}
@@ -47,9 +47,9 @@ class Find(implicit params: Command.Params) extends Command {
 		Response.Nothing()
 	}
 	
-	def handle(params: List[String]): Response = {
+	def handle(): Response = {
 		try {
-			solveParams(params) match {
+			solveArguments(arguments) match {
 				case Solver(Some(file), Some(depth)) => findFile(file, depth)
 				case Solver(Some(file), None) => findFile(file, 1)
 				case Solver(None, _)  => new Response.Failure("Need to specify a file or directory to search for")

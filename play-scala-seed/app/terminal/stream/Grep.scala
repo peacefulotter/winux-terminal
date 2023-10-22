@@ -1,19 +1,18 @@
 package terminal.stream
 
-import akka.actor.ActorRef
-import models.Response
 import terminal.colors.Ansi
 
 import scala.util.matching.Regex
 
-class Grep(manager: ActorRef, params: List[String]) extends LineStreamHandler(manager) {
+class Grep(params: List[String]) extends LineStreamHandler {
 	private val regex: Regex = (if (params.isEmpty) "" else params.head).r
-	// Can process other params if needed
 	
-	override def processLine(line: String, i: Int, session: Int): Unit = {
-		val matches = regex.replaceAllIn(line, m => s"${Ansi.RED}${Ansi.BOLD}${m}${Ansi.RESET}" )
+	override def processLine(line: String, i: Int, session: Int): Option[String] = {
 		if (regex.findFirstIn(line).nonEmpty) {
-			super.processLine(matches, i, session)
+			val matches = regex.replaceAllIn(line, m => s"${Ansi.RED}${Ansi.BOLD}${m}${Ansi.RESET}" )
+			Some(matches)
 		}
+		else
+			None
 	}
 }

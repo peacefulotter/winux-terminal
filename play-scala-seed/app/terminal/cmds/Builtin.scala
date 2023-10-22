@@ -9,11 +9,11 @@ import scala.io.Source
 
 class Builtin(implicit params: Command.Params) extends Command {
 	
-	def handle(params: List[String]): Response = {
+	def handle(): Response = {
 		try {
 			val env = new java.util.HashMap[String, String](System.getenv())
 			env.put("TERM", "xterm")
-			val command = (List("cd", path.toString(), "&&", keyword) ::: params).toArray
+			val command = (List("cd", path.toString(), "&&", keyword) ::: arguments).toArray
 			println(command.mkString(", "))
 			val process: PtyProcess = new PtyProcessBuilder()
 				.setCommand(command)

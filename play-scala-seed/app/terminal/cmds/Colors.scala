@@ -23,7 +23,7 @@ class Colors(implicit params: Command.Params) extends Command {
 	
 	private val ANSI_MEMBERS: List[String] = deepMembers(Ansi)
 	
-	def handle(params: List[String]): Response = {
+	def handle(): Response = {
 		Response.Success(DataFlex(ANSI_MEMBERS))
 	}
 }

@@ -12,7 +12,9 @@ abstract class Command(implicit params: Command.Params)
 	val path: Path = params.path
 	val session: Int = params.session
 	val keyword: String = params.keyword
-	def handle(params: List[String]): Response
+	val arguments: List[String] = params.arguments
+	
+	def handle(): Response
 }
 
 object Command {
@@ -21,6 +23,7 @@ object Command {
 		                 manager: ActorRef,
 		                 path: Path,
 		                 session: Int,
-		                 keyword: String
+		                 keyword: String,
+		                 arguments: List[String]
 	                 )
 }

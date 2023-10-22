@@ -67,7 +67,7 @@ class Top(implicit params: Command.Params, implicit val system: ActorSystem, imp
 		)), replace = true)
 	}
 	
-	def handle(params: List[String]): Response = {
+	def handle(): Response = {
 		val instance: Cancellable = system.scheduler.scheduleAtFixedRate(256.millisecond, 256.milliseconds)(() => {
 			val res = retrieveData()
 			manager ! SendResponse(session, res)

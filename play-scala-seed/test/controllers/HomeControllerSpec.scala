@@ -14,7 +14,7 @@ import scala.jdk.CollectionConverters._
  * For more information, see https://www.playframework.com/documentation/latest/ScalaTestingWithScalaTest
  */
 class HomeControllerSpec extends PlaySpec {
-	private def round2(n: Double): Double = math.round(n * 100) / 100
+	private def round2(n: Double): Double = math.round(n * 100) / 100.toDouble
 
 	def test() = {
 		val si = new SystemInfo

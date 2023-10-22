@@ -8,7 +8,7 @@ import terminal.colors.Ansi.{BOLD, BRIGHT_BLUE, BRIGHT_YELLOW, RESET}
 import scala.jdk.CollectionConverters._
 
 class System(implicit params: Command.Params) extends Command {
-	def handle(params: List[String]): Response = {
+	def handle(): Response = {
 		val si = new SystemInfo()
 		val os = si.getOperatingSystem
 		val hal = si.getHardware

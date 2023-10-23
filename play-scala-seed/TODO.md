@@ -1,0 +1,5 @@
+- rename Streamer to something like Responder
+  - Responder.stream(_)
+  - Responder.respond(_)
+  - Make all commands use the Responder after retuning their response (modify Terminal)
+  - This will make the stream handlers available to all commands by default

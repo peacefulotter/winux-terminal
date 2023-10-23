@@ -4,53 +4,59 @@ import akka.actor.ActorRef
 
 import scala.annotation.tailrec
 
-class StreamParamsParser(manager: ActorRef) {
+object StreamParamsParser {
 
 	private type SSEOutput = Boolean
-	private type HandlerFactory = List[String] => LineStreamHandler
+	private type Pipeline = Streamer.Pipeline
+	private type HandlerFactory = List[String] => StreamHandler
+	private case class HandlerManager(pipeline: Pipeline = Nil,
+	                                  factory: Option[HandlerFactory] = None,
+	                                  params: List[String] = Nil)
 	
-	private val SSEHandler = new SSEStreamHandler(manager)
+	private def addHandler(handler: HandlerManager, newFactory: HandlerFactory): HandlerManager = HandlerManager(
+		handler.factory match {
+			case Some(factory) => handler.pipeline :+ factory(handler.params)
+			case _ => handler.pipeline
+		},
+		Some(newFactory),
+		Nil
+	)
 	
-	private def addHandler(
-		                      handlers: List[LineStreamHandler], 
-		                      handlerFactory: Option[HandlerFactory], 
-		                      handlerParams: List[String]
-	                      ): List[LineStreamHandler] = handlerFactory match {
-		case Some(factory) => handlers :+ factory(handlerParams)
-		case _ => handlers
-	}
+	private def addHandlerParam(handler: HandlerManager, param: String): HandlerManager = HandlerManager(
+		handler.pipeline,
+		handler.factory,
+		handler.params :+ param
+	)
 	
 	@tailrec
 	private def _parse(
-		                  params: List[String],
-		                  handlerFactory: Option[HandlerFactory] = None,
-		                  handlerParams: List[String] = Nil,
-		                  handlers: List[LineStreamHandler] = Nil,
+		                  arguments: List[String],
+		                  handler: HandlerManager = HandlerManager(),
 		                  sseOutput: SSEOutput = true
-	                  ): (List[LineStreamHandler], SSEOutput) =
-		params match {
-			case cmd :: rest => (cmd, rest) match {
+	                  ): (Pipeline, SSEOutput) =
+		arguments match {
+			case cmd :: args => (cmd, args) match {
 				case (separator, x :: xs) if separator == "|" || separator == ">" =>
-					val newHandlers = addHandler(handlers, handlerFactory, handlerParams)
 					separator match {
 						case "|" => x match {
-							case "grep" => _parse(rest, Some(params => new Grep(params)), Nil, newHandlers, sseOutput);
+							case "grep" => _parse(args, addHandler(handler, new Grep(_)), sseOutput);
 							case _ => throw new Error("| needs to be followed by a stream handler command")
 						}
-						case ">" => _parse(rest, Some(params => new FileStreamHandler(params)), Nil, newHandlers, sseOutput=false)
+						case ">" => _parse(args, addHandler(handler, new FileStreamHandler(_)), sseOutput=false)
 					}
-				case (param, _) => handlerFactory match {
-					case Some(_) => _parse(rest, handlerFactory, handlerParams :+ param, handlers, sseOutput)
-					case None => _parse(rest, handlerFactory, handlerParams, handlers)
+				case (param, _) => handler.factory match {
+					case Some(_) => _parse(args, addHandlerParam(handler, param), sseOutput)
+					case None => _parse(args, handler)
 				}
 			}
 			case _ =>
-				val newHandlers = addHandler(handlers, handlerFactory, handlerParams)
-				(newHandlers, sseOutput)
+				(addHandler(handler, null).pipeline, sseOutput)
 		}
 
-	def parse(params: List[String]): List[LineStreamHandler] = _parse(params) match {
-		case (handlers, true) => handlers ::: List(SSEHandler)
+	def parse(arguments: List[String], manager: ActorRef, session: Int): Pipeline = _parse(arguments) match {
+		case (handlers, true) =>
+			val SSEHandler = new SSEStreamHandler(manager, session)
+			handlers ::: List(SSEHandler)
 		case (handlers, _) => handlers
 	}
 }

@@ -1,10 +1,19 @@
 package terminal.stream
 
-import models.Response
+import models.{DataAutocompletion, DataFlex, DataLine, DataList, DataNothing, DataTable, Response, ResponseData}
 
-class FileStreamHandler(params: List[String]) extends LineStreamHandler {
+class FileStreamHandler(params: List[String]) extends StreamHandler {
 	
-	def processLine(line: String, i: Int, session: Int): Option[String] = {
+	 private val filename: String = {
+		if (params.isEmpty)
+			throw new Error("FileStreamHandler (>) requires to specify a filename")
+		else
+			params.head
+	}
+	
+	override def process(data: ResponseData[_], filter: Boolean = true): Option[ResponseData[_]] = {
+		println(data.json, filename)
+		???
 		None
 	}
 	

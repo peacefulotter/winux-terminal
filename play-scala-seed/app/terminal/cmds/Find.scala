@@ -27,10 +27,10 @@ class Find(implicit params: Command.Params) extends Command {
 	}
 	
 	private def findFile(file: String, depth: Int): Response = {
-		manager ! SendResponse(session, Response.Success(DataLine(
+		streamer.to(DataLine(
 			s"Searching for '$file' with depth=$depth...",
 			Colors.Text.Info
-		)))
+		), filter=false)
 		
 		def skip: (Path, StatInfo) => Boolean = (p: Path, stats: StatInfo) => {
 			stats.isFile && !PathHelper.withExtension(p).matches(file)
@@ -39,9 +39,9 @@ class Find(implicit params: Command.Params) extends Command {
 		os.walk.stream.attrs(path, skip, maxDepth=depth)
 			.filter { case (p, s) => s.isFile }
 			.foreach { c =>
-				manager ! SendResponse(session, Response.Success(DataLine(
+				streamer.to(DataLine(
 					PathHelper.getFileName(c, fullPath = true)
-				)))
+				))
 			}
 			
 		Response.Nothing()

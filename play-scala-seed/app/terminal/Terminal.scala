@@ -6,6 +6,7 @@ import os.Path
 import terminal.cmds._
 import terminal.features.{Autocomplete, History}
 import terminal.helpers.InputHelper.parseInput
+import terminal.stream.Streamer
 
 import scala.concurrent.ExecutionContext
 
@@ -21,6 +22,7 @@ class Terminal(manager: ActorRef)(implicit system: ActorSystem, implicit val ec:
 		}
 		
 		val (keyword, arguments) = (input.head, input.tail)
+		
 		implicit val params: Command.Params = Command.Params(this, manager, path, session, keyword, arguments)
 		lazy val commands = Map(
 			"bat" -> new Bat,

@@ -1,6 +1,6 @@
 package terminal.cmds
 
-import models.{DataFlex, Response}
+import models.Response
 import terminal.colors.Ansi
 
 import scala.Console.RESET
@@ -14,7 +14,7 @@ class Colors(implicit params: Command.Params) extends Command {
 				case m: ModuleSymbol => members(m)
 				case m: MethodSymbol if m.isAccessor => m.returnType match {
 					case ConstantType(Constant(s: String)) =>
-						List(s"${s}${m.name.decodedName.toString}${RESET}")
+						List(s"${s}${m.name.decodedName.toString}$RESET")
 					case _ => List.empty[String]
 				}
 			}.foldLeft(List.empty[String])(_ ::: _)
@@ -24,7 +24,7 @@ class Colors(implicit params: Command.Params) extends Command {
 	private val ANSI_MEMBERS: List[String] = deepMembers(Ansi)
 	
 	def handle(): Response = {
-		Response.Success(DataFlex(ANSI_MEMBERS))
+		Response.Flex(ANSI_MEMBERS)
 	}
 }
 

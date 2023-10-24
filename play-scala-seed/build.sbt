@@ -17,6 +17,10 @@ libraryDependencies += "org.jetbrains.pty4j" % "pty4j" % "0.12.13"
 libraryDependencies += "com.lihaoyi" %% "fansi" % "0.4.0"
 libraryDependencies += "com.github.oshi" % "oshi-core" % "6.4.0"
 libraryDependencies +=  "ch.qos.logback" % "logback-classic" % "1.4.7"
+
+val AkkaVersion = "2.8.0"
+libraryDependencies += "com.typesafe.akka" %% "akka-actor-testkit-typed" % AkkaVersion % Test
+libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.15" % Test
 // Adds additional packages into Twirl
 //TwirlKeys.templateImports += "com.example.controllers._"
 

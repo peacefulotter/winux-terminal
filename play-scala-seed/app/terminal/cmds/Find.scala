@@ -1,8 +1,6 @@
 package terminal.cmds
 
-import akka.actor.ActorRef
-import managers.ActorRefManager.SendResponse
-import models.{DataLine, Response}
+import models.Response
 import os.{Path, StatInfo}
 import terminal.helpers.PathHelper
 
@@ -10,24 +8,24 @@ import scala.util.{Failure, Success, Try}
 import scala.annotation.tailrec
 
 class Find(implicit params: Command.Params) extends Command {
-	private case class Solver(file: Option[String], depth: Option[Int])
+	private case class Parsed(file: Option[String], depth: Option[Int])
 	
 	@tailrec
-	private def solveArguments(args: List[String], solver: Solver = Solver(None, None)): Solver = {
+	private def parseArguments(args: List[String], parsed: Parsed = Parsed(None, None)): Parsed = {
 		args match {
 			case arg :: xs => arg match {
 				case s"--depth=$d" => Try(d.toInt) match {
-					case Success(depth) => solveArguments(xs, Solver(solver.file, Some(depth)))
+					case Success(depth) => parseArguments(xs, Parsed(parsed.file, Some(depth)))
 					case Failure(_) => throw new NumberFormatException(s"depth parameter should be int, got $d")
 				}
-				case file => solveArguments(xs, Solver(Some(file), solver.depth))
+				case file => parseArguments(xs, Parsed(Some(file), parsed.depth))
 			}
-			case _ => solver
+			case _ => parsed
 		}
 	}
 	
 	private def findFile(file: String, depth: Int): Response = {
-		streamer.to(DataLine(
+		streamer.send(Response.Line(
 			s"Searching for '$file' with depth=$depth...",
 			Colors.Text.Info
 		), filter=false)
@@ -37,26 +35,26 @@ class Find(implicit params: Command.Params) extends Command {
 		}
 		
 		os.walk.stream.attrs(path, skip, maxDepth=depth)
-			.filter { case (p, s) => s.isFile }
+			.filter { case (_, s) => s.isFile }
 			.foreach { c =>
-				streamer.to(DataLine(
+				streamer.send(Response.Line(
 					PathHelper.getFileName(c, fullPath = true)
 				))
 			}
-			
+		
 		Response.Nothing()
 	}
 	
 	def handle(): Response = {
 		try {
-			solveArguments(arguments) match {
-				case Solver(Some(file), Some(depth)) => findFile(file, depth)
-				case Solver(Some(file), None) => findFile(file, 1)
-				case Solver(None, _)  => new Response.Failure("Need to specify a file or directory to search for")
+			parseArguments(arguments) match {
+				case Parsed(Some(file), Some(depth)) => findFile(file, depth)
+				case Parsed(Some(file), None) => findFile(file, 1)
+				case Parsed(None, _)  => Response.Line.error("Need to specify a file or directory to search for")
 			}
 		}
 		catch {
-			case e: Exception => new Response.Failure(e.getMessage)
+			case e: Exception => Response.Line.error(e.getMessage)
 		}
 	}
 }

@@ -1,7 +1,7 @@
 package terminal.cmds
 
 import com.pty4j.{PtyProcess, PtyProcessBuilder}
-import models.{DataLine, Response}
+import models.Response
 
 import scala.language.postfixOps
 import java.io.IOException
@@ -24,12 +24,12 @@ class Builtin(implicit params: Command.Params) extends Command {
 			val stdout = Source.fromInputStream(is).mkString
 			process.getOutputStream // to avoid closing unused process's stdin in destroy method
 			process.waitFor()
-			Response.Success(DataLine(stdout))
+			Response.Line(stdout)
 		}
 		catch {
-			case e: IOException => new Response.Failure(e.getMessage)
-			case e: UnsupportedOperationException => new Response.Failure(e.getMessage)
-			case e: os.SubprocessException => new Response.Failure(e.getMessage)
+			case e: IOException => Response.Line.error(e.getMessage)
+			case e: UnsupportedOperationException => Response.Line.error(e.getMessage)
+			case e: os.SubprocessException => Response.Line.error(e.getMessage)
 		}
 	}
 }

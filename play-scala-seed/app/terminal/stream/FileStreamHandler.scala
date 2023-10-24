@@ -1,6 +1,6 @@
 package terminal.stream
 
-import models.{DataAutocompletion, DataFlex, DataLine, DataList, DataNothing, DataTable, Response, ResponseData}
+import models.Response
 
 class FileStreamHandler(params: List[String]) extends StreamHandler {
 	
@@ -11,8 +11,8 @@ class FileStreamHandler(params: List[String]) extends StreamHandler {
 			params.head
 	}
 	
-	override def process(data: ResponseData[_], filter: Boolean = true): Option[ResponseData[_]] = {
-		println(data.json, filename)
+	override def process(res: Response, filter: Boolean = true): Option[Response] = {
+		println(res.json, filename)
 		???
 		None
 	}

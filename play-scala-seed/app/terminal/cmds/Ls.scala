@@ -1,6 +1,6 @@
 package terminal.cmds
 
-import models.{DataFlex, Response}
+import models.Response
 import os.{Path, StatInfo}
 import terminal.helpers.PathHelper
 
@@ -24,8 +24,8 @@ class Ls(implicit params: Command.Params) extends Command {
 				.map { case (p, attrs) =>
 					(PathHelper.getFileName((p, attrs)), attrs.isDir)
 				}
-			Response.Success(DataFlex(content))
-		case Right(msg) => new Response.Failure(msg)
+			Response.Flex(content)
+		case Right(msg) => Response.Line.error(msg)
 	}
 }
 

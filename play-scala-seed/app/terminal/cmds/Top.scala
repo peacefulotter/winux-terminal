@@ -1,9 +1,8 @@
 package terminal.cmds
 
-import akka.actor.{ActorRef, ActorSystem, Cancellable}
-import models.{DataTable, Response}
+import akka.actor.{ActorSystem, Cancellable}
+import models.Response
 import com.sun.management.OperatingSystemMXBean
-import managers.ActorRefManager.SendResponse
 import oshi.SystemInfo
 import oshi.software.os.OperatingSystem
 import oshi.util.FormatUtil
@@ -40,10 +39,10 @@ class Top(implicit params: Command.Params, implicit val system: ActorSystem, imp
 			.map(p => {
 				val cpu = prevCpuTime.get(p.getProcessID) match {
 					case Some((prevTime, prevNano)) =>
-						val curTime = p.getKernelTime + p.getUserTime;
-						val elapsed = (System.nanoTime() - prevNano) / 1_000_000.toDouble;
+						val curTime = p.getKernelTime + p.getUserTime
+						val elapsed = (System.nanoTime() - prevNano) / 1_000_000.toDouble
 						val timeDif = curTime - prevTime
-						100.toDouble * timeDif / elapsed;
+						100.toDouble * timeDif / elapsed
 					case None =>
 						0.toDouble
 				}
@@ -61,16 +60,16 @@ class Top(implicit params: Command.Params, implicit val system: ActorSystem, imp
 			"VS" -> (e._1.getVirtualSize, FormatUtil.formatBytes(e._1.getVirtualSize)),
 			"CPU" -> (round2(e._2), round2(e._2).toString)
 		)).toSeq
-		Response.Success(DataTable(Map(
+		Response.Table(Map(
 			"table" -> table,
 			"keys" -> table.head.keySet.toSeq
-		)), replace = true)
+		), replace = true)
 	}
 	
 	def handle(): Response = {
 		val instance: Cancellable = system.scheduler.scheduleAtFixedRate(256.millisecond, 256.milliseconds)(() => {
 			val res = retrieveData()
-			manager ! SendResponse(session, res)
+			streamer.send(res)
 		})
 		system.scheduler.scheduleOnce(5.seconds, new Runnable {
 			override def run(): Unit = instance.cancel()

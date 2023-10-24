@@ -1,6 +1,6 @@
 package terminal.cmds
 
-import models.{DataList, Response}
+import models.Response
 import terminal.colors.Ansi.{BOLD, RESET}
 
 class HistoryCmd(implicit params: Command.Params) extends Command {
@@ -10,7 +10,7 @@ class HistoryCmd(implicit params: Command.Params) extends Command {
 		val labels = terminal.history.get.zipWithIndex
 			.map { case (cmd, i) => f"  $BOLD$i%3s$RESET  $cmd" }
 			.toList
-		Response.Success(DataList.default(labels))
+		Response.List(labels)
 	}
 }
 

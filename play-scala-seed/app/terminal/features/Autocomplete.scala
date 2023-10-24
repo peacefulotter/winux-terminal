@@ -1,6 +1,6 @@
 package terminal.features
 
-import models.{DataAutocompletion, Response}
+import models.Response
 import os.{Path, StatInfo}
 import terminal.helpers.{InputHelper, PathHelper}
 
@@ -45,7 +45,7 @@ class Autocomplete() {
 		}
 	}
 	
-	private def autocomplete(cmd: String, path: Path, child: Child, candidates: Candidates): Response = {
+	private def autocomplete(cmd: String, child: Child, candidates: Candidates): Response = {
 		def getTextDropChildFolder: String =
 			child match {
 				case Some(partialFolder) => cmd.dropRight(partialFolder.length)
@@ -57,7 +57,7 @@ class Autocomplete() {
 			
 		if (candidates.length == 1) {
 			val autocompletion = getTextDropChildFolder + PathHelper.getFileName(candidates.head)
-			Response.Success(DataAutocompletion(autocompletion))
+			Response.Autocompletion(autocompletion)
 		}
 		
 		else if (candidates.length > 1) {
@@ -66,7 +66,7 @@ class Autocomplete() {
 				.sortBy { case (name, isDir) => (isDir, name) }
 			val commonPath = propositions.foldLeft(propositions.head._1)((acc, cur) => getCommonPrefix(acc, cur._1))
 			val autocompletion = getTextDropChildFolder + commonPath
-			Response.Success(DataAutocompletion(autocompletion, propositions))
+			Response.Autocompletion(autocompletion, propositions)
 		}
 		
 		else
@@ -75,8 +75,8 @@ class Autocomplete() {
 	
 	def handle(cmd: String, path: Path): Response = {
 		getCompletionCandidates(cmd, path) match {
-			case Left((child, candidates)) => autocomplete(cmd, path, child, candidates)
-			case Right(msg) => new Response.Failure(msg)
+			case Left((child, candidates)) => autocomplete(cmd, child, candidates)
+			case Right(msg) => Response.Line.error(msg)
 			case _ => Response.Nothing();
 		}
 	}

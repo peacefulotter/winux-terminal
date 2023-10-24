@@ -1,6 +1,6 @@
 package terminal.cmds
 
-import models.{DataList, Response}
+import models.Response
 import oshi.SystemInfo
 import oshi.util.FormatUtil
 import terminal.colors.Ansi.{BOLD, BRIGHT_BLUE, BRIGHT_YELLOW, RESET}
@@ -18,27 +18,27 @@ class System(implicit params: Command.Params) extends Command {
 		val vm = mem.getVirtualMemory
 		
 		val gpus = hal.getGraphicsCards.asScala.zipWithIndex.map { case (gpu, i) =>
-			s"${BRIGHT_YELLOW}[$i]${RESET} ${gpu.getName}, VRAM: ${FormatUtil.formatBytes(gpu.getVRam)}"
+			s"$BRIGHT_YELLOW[$i]$RESET ${gpu.getName}, VRAM: ${FormatUtil.formatBytes(gpu.getVRam)}"
 		}
 		val disks = hal.getDiskStores.asScala.zipWithIndex.map { case (disk, i) =>
-			s"${BRIGHT_YELLOW}[$i]${RESET} ${disk.getModel}, ${FormatUtil.formatBytes(disk.getSize)}"
+			s"$BRIGHT_YELLOW[$i]$RESET ${disk.getModel}, ${FormatUtil.formatBytes(disk.getSize)}"
 		}
 		
-		Response.Success(DataList.default(List(
-			s"${BRIGHT_BLUE}${BOLD}Manufacturer${RESET}: ${sys.getManufacturer}, Model: ${sys.getModel}, Released: ${sys.getFirmware.getReleaseDate}",
-			s"${BRIGHT_BLUE}${BOLD}Operating System${RESET}: ${os.getManufacturer} ${os.getFamily} ${os.getVersionInfo}",
-			s"${BRIGHT_BLUE}${BOLD}Virtual Mem${RESET}: ${FormatUtil.formatBytes(vm.getVirtualInUse)} / ${FormatUtil.formatBytes(vm.getVirtualMax)}",
-			s"${BRIGHT_BLUE}${BOLD}Virtual Swap${RESET}: ${FormatUtil.formatBytes(vm.getSwapUsed)} / ${FormatUtil.formatBytes(vm.getSwapTotal)}",
-			s"${BRIGHT_BLUE}${BOLD}Physical Mem${RESET}: ${FormatUtil.formatBytes(mem.getTotal - mem.getAvailable)} / ${FormatUtil.formatBytes(mem.getTotal)}",
-			s"${BRIGHT_BLUE}${BOLD}CPU${RESET}:",
+		Response.List(List(
+			s"$BRIGHT_BLUE${BOLD}Manufacturer$RESET: ${sys.getManufacturer}, Model: ${sys.getModel}, Released: ${sys.getFirmware.getReleaseDate}",
+			s"$BRIGHT_BLUE${BOLD}Operating System$RESET: ${os.getManufacturer} ${os.getFamily} ${os.getVersionInfo}",
+			s"$BRIGHT_BLUE${BOLD}Virtual Mem$RESET: ${FormatUtil.formatBytes(vm.getVirtualInUse)} / ${FormatUtil.formatBytes(vm.getVirtualMax)}",
+			s"$BRIGHT_BLUE${BOLD}Virtual Swap$RESET: ${FormatUtil.formatBytes(vm.getSwapUsed)} / ${FormatUtil.formatBytes(vm.getSwapTotal)}",
+			s"$BRIGHT_BLUE${BOLD}Physical Mem$RESET: ${FormatUtil.formatBytes(mem.getTotal - mem.getAvailable)} / ${FormatUtil.formatBytes(mem.getTotal)}",
+			s"$BRIGHT_BLUE${BOLD}CPU$RESET:",
 			s"\t${cpu.getProcessorIdentifier.getName} ${cpu.getProcessorIdentifier.getModel} ${cpu.getProcessorIdentifier.getMicroarchitecture}",
 			s"\tProcessors: ${cpu.getLogicalProcessorCount} physical, ${cpu.getPhysicalProcessorCount} logical",
 			s"\tMax frequency: ${FormatUtil.formatHertz(cpu.getMaxFreq)}",
-			s"${BRIGHT_BLUE}${BOLD}GPU(s)${RESET}:",
+			s"$BRIGHT_BLUE${BOLD}GPU(s)$RESET:",
 			s"\t${gpus.mkString("\n\t")}",
-			s"${BRIGHT_BLUE}${BOLD}Disk(s)${RESET}:",
+			s"$BRIGHT_BLUE${BOLD}Disk(s)$RESET:",
 			s"\t${disks.mkString("\n\t")}",
-		)))
+		))
 	}
 }
 

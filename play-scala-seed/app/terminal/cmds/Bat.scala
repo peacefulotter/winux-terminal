@@ -1,15 +1,15 @@
 package terminal.cmds
 
-import models.{DataObject, Response}
+import models.Response
 
 class Bat(implicit params: Command.Params) extends Cat {
 	
 	private def sendStartStream(file: String): Unit = {
-		val data = DataObject("bat", Map(
+		val data = Response.Object("bat", Map(
 			"lang" -> "typescript",
 			"file" -> file,
 		))
-		streamer.to(data, filter=false)
+		streamer.send(data, filter=false)
 	}
 	
 	override def handle(): Response = arguments match {
@@ -17,6 +17,6 @@ class Bat(implicit params: Command.Params) extends Cat {
 			sendStartStream(file)
 			pipeStream(file)
 			Response.Nothing()
-		case _ => new Response.Failure("bat requires a filename")
+		case _ => Response.Line.error("bat requires a filename")
 	}
 }

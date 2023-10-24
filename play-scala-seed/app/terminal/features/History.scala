@@ -1,20 +1,20 @@
 package terminal.features
 
-import models.{DataHistory, Response}
+import models.Response
 
 import scala.collection.mutable.ListBuffer
 
 class History() {
-	private val DEFAULT_INDEX = -1;
+	private val DEFAULT_INDEX = -1
 	private val MAX_SIZE = 64
 	private val history = ListBuffer[String]()
 	
-	private var index = DEFAULT_INDEX;
+	private var index = DEFAULT_INDEX
 	
 	def push(cmd: String): Unit = {
 		index = DEFAULT_INDEX
 		if (history.nonEmpty && cmd == history.head)
-			return;
+			return
 		if (history.size >= MAX_SIZE)
 			history.dropInPlace(1) // Remove the last element to make space for the new one
 		history.prepend(cmd)
@@ -31,7 +31,7 @@ class History() {
 	}
 	
 	private def handleHistoryPull(routine: () => Option[String]): Response = routine() match {
-		case Some(cmd) => Response.Success(DataHistory(cmd))
+		case Some(cmd) => Response.History(cmd)
 		case None => Response.Nothing();
 	}
 	

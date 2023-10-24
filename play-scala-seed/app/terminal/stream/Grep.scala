@@ -1,6 +1,6 @@
 package terminal.stream
 
-import models.{DataAutocompletion, DataFlex, DataHistory, DataLine, DataList, DataNothing, DataObject, DataPath, DataTable, ResponseData}
+import models.Response
 import terminal.colors.Ansi
 
 import scala.util.matching.Regex
@@ -16,47 +16,47 @@ class Grep(params: List[String]) extends StreamHandler {
 		else
 			None
 			
-	private def processMap[T, U <: ResponseData[_]](data: Map[String, T], creator: Map[String, T] => U): Option[U] = {
+	private def processMap[T, U <: Response](data: Map[String, T], creator: Map[String, T] => U): Option[U] = {
 		val newMap = data.keySet.map(k => (k, processLine(k))).collect {
 			case (k, matched) if matched.nonEmpty => (matched.get, data(k))
 		}.toMap
 		if (newMap.nonEmpty) Some(creator(newMap)) else None
 	}
 	
-	override def process(data: ResponseData[_], filter: Boolean = true): Option[ResponseData[_]] =
-		if (!filter) Some(data)
-		else data match {
-			case DataNothing() => None
-			case DataLine(data, color) => processLine(data) match {
-				case Some(line) => Some(DataLine(line, color))
+	override def process(res: Response, filter: Boolean = true): Option[Response] =
+		if (!filter) Some(res)
+		else res match {
+			case Response.Nothing() => None
+			case Response.Line(text, color, status, replace) => processLine(text) match {
+				case Some(text) => Some(Response.Line(text, color, status, replace))
 				case _ => None
 			}
-			case DataObject(name, data) => processMap(data, m => DataObject(name, m))
-	        case DataFlex(data) =>
+			case Response.Object(name, data, status, replace) => processMap(data, m => Response.Object(name, m, status, replace))
+	        case Response.Flex(data, status, replace) =>
 				if (data.isEmpty) return None
 				data.head match {
 					case _: String =>
 						val seq = data.asInstanceOf[Seq[String]].map(processLine).collect {
 							case s if s.nonEmpty => s.get
 						}
-						if (seq.nonEmpty) Some(DataFlex(seq)) else None
+						if (seq.nonEmpty) Some(Response.Flex(seq, status, replace)) else None
 					case _ =>
 						throw new Error("Impossible match in Grep.process, passed a DataFlex(seq: Seq[T != String]), must be of type DataFlex(seq: Seq[String])")
 				}
-			case DataList(data) =>
+			case Response.List(data, status, replace) =>
 				if (data.isEmpty) return None
 				val seq = data
 					.map { case (text, color) => (processLine(text), color) }
 					.collect { case (text, color) if text.nonEmpty => (text.get, color) }
-				if (seq.nonEmpty) Some(DataList(seq)) else None
-			case DataTable(data) =>
-				processMap(data, (m: Map[String, Any]) => DataTable(m))
-			case DataPath(_) =>
-				throw new Error("Impossible match in Grep.process, passed a ResponseData of type DataPath")
-			case DataHistory(data) =>
-				throw new Error("Impossible match in Grep.process, passed a ResponseData of type DataHistory")
-			case DataAutocompletion(_, _) =>
-				throw new Error("Impossible match in Grep.process, passed a ResponseData of type DataAutocompletion")
+				if (seq.nonEmpty) Some(Response.List(seq, status, replace)) else None
+			case Response.Table(data, status, replace) =>
+				processMap(data, (m: Map[String, Any]) => Response.Table(m, status, replace))
+			case Response.Path(_) =>
+				throw new Error("Impossible match in Grep.process, passed a Response of type DataPath")
+			case Response.History(_) =>
+				throw new Error("Impossible match in Grep.process, passed a Response of type DataHistory")
+			case Response.Autocompletion(_, _) =>
+				throw new Error("Impossible match in Grep.process, passed a Response of type DataAutocompletion")
 			/*Some(DataAutocompletion(autocompletion, (propositions
 				map { case (f, isDir) => (processLine(f), isDir) }
 				filter { case (f, _) => f.nonEmpty }

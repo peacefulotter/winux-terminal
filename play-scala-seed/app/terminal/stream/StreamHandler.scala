@@ -1,8 +1,8 @@
 package terminal.stream
 
-import models.{Response, ResponseData}
+import models.Response
 
 trait StreamHandler {
-	def process(data: ResponseData[_], filter: Boolean = true): Option[ResponseData[_]]
+	def process(res: Response, filter: Boolean = true): Option[Response]
 	def done(): Response = Response.Nothing()
 }

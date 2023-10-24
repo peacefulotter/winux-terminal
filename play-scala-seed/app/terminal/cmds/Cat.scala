@@ -1,6 +1,6 @@
 package terminal.cmds
 
-import models.{DataLine, Response}
+import models.Response
 import os.{Path, RelPath}
 import terminal.stream.StreamHandler
 
@@ -11,7 +11,7 @@ class Cat(implicit params: Command.Params) extends Command {
 	
 	protected def pipeStream(file: String): Unit = {
 		streamRead(file).zipWithIndex.foreach {
-			case (line, i) => streamer.to(DataLine(line))
+			case (line, i) => streamer.send(Response.Line(line))
 		}
 	}
 	
@@ -20,6 +20,6 @@ class Cat(implicit params: Command.Params) extends Command {
 			// s"${Ansi.BRIGHT_BLACK}[$i]${Ansi.RESET}\t"
 			pipeStream(file)
 			Response.Nothing()
-		case _ => new Response.Failure("cat requires a filename")
+		case _ => Response.Line.error("cat requires a filename")
 	}
 }

@@ -1,6 +1,6 @@
 package terminal.cmds
 
-import models.{DataPath, Response}
+import models.Response
 import terminal.helpers.PathHelper
 
 import scala.util.{Failure, Success}
@@ -12,14 +12,13 @@ class Cd(implicit params: Command.Params) extends Command {
 			PathHelper.getSubPath(path, dir) match {
 				case Success(path) =>
 					if (os.isDir(path))
-						Response.Success(DataPath(path.toString()))
+						Response.Path(path.toString())
 					else
-						new Response.Failure(f"$path is not a directory")
+						Response.Line.error(f"$path is not a directory")
 				case Failure(exception) =>
-					new Response.Failure(exception.getMessage)
+					Response.Line.error(exception.getMessage)
 			}
 		case _ => Response.Nothing()
-		
 	}
 }
 
